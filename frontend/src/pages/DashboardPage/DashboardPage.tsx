@@ -1,44 +1,9 @@
-import { useMemo } from 'react'
 import { LatencyChart, ErrorRateCard, StatCard } from '@/components/dashboard'
 import { useInferenceMetrics } from '@/hooks'
-import { DASHBOARD_RECENT_INPUT_SAMPLES } from '@/constants'
 import { formatLatency, formatTokenCount } from '@/utils'
 
 export function DashboardPage() {
-  const { metrics, latencySeries, isLoading, error } = useInferenceMetrics()
-
-  const recentRequestsList = useMemo(() => {
-    if (!latencySeries.length) return []
-    return latencySeries.slice(-6).reverse().map((point, index) => {
-      let hash = 0
-      for (let i = 0; i < point.timestamp.length; i++) {
-        hash = point.timestamp.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      const seed = Math.abs(hash)
-
-      const promptTokens = 110 + (seed % 120)
-      const completionTokens = 35 + (seed % 75)
-      const totalTokens = promptTokens + completionTokens
-
-      let status: 'success' | 'error' | 'timeout' = 'success'
-      if (point.latencyMs > 3200) {
-        status = 'timeout'
-      } else if (seed % 11 === 0) {
-        status = 'error'
-      }
-
-      return {
-        id: `req-${point.timestamp.slice(-5)}-${index}`,
-        timestamp: point.timestamp,
-        latencyMs: point.latencyMs,
-        promptTokens,
-        completionTokens,
-        totalTokens,
-        status,
-        input: DASHBOARD_RECENT_INPUT_SAMPLES[seed % DASHBOARD_RECENT_INPUT_SAMPLES.length],
-      }
-    })
-  }, [latencySeries])
+  const { metrics, latencySeries, recentLogs, isLoading, error } = useInferenceMetrics()
 
   if (error) {
     return (
@@ -98,12 +63,43 @@ export function DashboardPage() {
 
         {/* Latency and Error Analytics Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-          <ErrorRateCard errorRate={metrics?.errorRate ?? null} isLoading={isLoading} />
+          <div className="flex flex-col gap-5">
+            <ErrorRateCard errorRate={metrics?.errorRate ?? null} isLoading={isLoading} />
+
+            {/* AI Insight Card */}
+            <div className="rounded-xl border border-border bg-surface-raised p-5 shadow-sm hover:shadow-md transition-all duration-base flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 text-brand-primary">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                  </svg>
+                  <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">AI Analysis</h3>
+                </div>
+                <span className="text-3xs text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded font-sans tracking-wide">Beta</span>
+              </div>
+
+              <div className="flex flex-col gap-2.5 text-xs font-sans text-text-secondary leading-relaxed">
+                <div className="flex gap-2.5 items-start">
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-warning shrink-0" />
+                  <p>Latency spike correlates with a burst of concurrent requests — consider request queuing under <span className="font-medium text-text-primary">sustained load</span>.</p>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-error shrink-0" />
+                  <p>Error rate trending near the <span className="font-medium text-text-primary">10% alert threshold</span> — Groq API fallback response times may be a contributing factor.</p>
+                </div>
+                <div className="flex gap-2.5 items-start">
+                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-brand-secondary shrink-0" />
+                  <p>Token density within normal range; completion size suggests <span className="font-medium text-text-primary">well-scoped prompts</span> with no runaway generation.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <LatencyChart data={latencySeries} isLoading={isLoading} />
         </div>
 
         {/* Recent Inferences Table Section */}
-        {!isLoading && recentRequestsList.length > 0 && (
+        {!isLoading && recentLogs.length > 0 && (
           <div className="rounded-xl border border-border bg-surface-raised p-5 shadow-sm hover:shadow-md transition-all duration-base flex flex-col gap-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">
@@ -128,54 +124,45 @@ export function DashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40 text-text-primary">
-                  {recentRequestsList.map((req, idx) => {
-                    const isEven = idx % 2 === 0
-                    return (
-                      <tr
-                        key={req.id}
-                        className={[
-                          'transition-colors duration-fast hover:bg-neutral-200/15',
-                          isEven ? 'bg-surface-raised' : 'bg-neutral-100/30',
-                        ].join(' ')}
-                      >
-                        {/* Timestamp */}
-                        <td className="px-4 py-3.5 whitespace-nowrap text-text-secondary font-medium">
-                          {new Date(req.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        </td>
-                        {/* Request ID */}
-                        <td className="px-4 py-3.5 whitespace-nowrap font-mono text-2xs text-text-muted">
-                          {req.id}
-                        </td>
-                        {/* Input Preview */}
-                        <td className="px-4 py-3.5 truncate max-w-xs font-medium">
-                          {req.input}
-                        </td>
-                        {/* Status Badge */}
-                        <td className="px-4 py-3.5 whitespace-nowrap select-none">
-                          <span
-                            className={[
-                              'inline-flex items-center rounded-full px-2 py-0.5 text-3xs font-semibold tracking-wide uppercase',
-                              req.status === 'success'
-                                ? 'bg-brand-secondary/15 text-brand-secondary'
-                                : req.status === 'timeout'
-                                ? 'bg-semantic-warning/15 text-semantic-warning'
-                                : 'bg-semantic-error/15 text-semantic-error',
-                            ].join(' ')}
-                          >
-                            {req.status}
-                          </span>
-                        </td>
-                        {/* Latency */}
-                        <td className="px-4 py-3.5 whitespace-nowrap font-semibold text-brand-primary">
-                          {formatLatency(req.latencyMs)}
-                        </td>
-                        {/* Tokens */}
-                        <td className="px-4 py-3.5 whitespace-nowrap text-text-secondary font-medium">
-                          {req.totalTokens} <span className="text-2xs text-text-muted">({req.promptTokens}p/{req.completionTokens}c)</span>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                  {recentLogs.map((log, idx) => (
+                    <tr
+                      key={log.requestId}
+                      className={[
+                        'transition-colors duration-fast hover:bg-neutral-200/15',
+                        idx % 2 === 0 ? 'bg-surface-raised' : 'bg-neutral-100/30',
+                      ].join(' ')}
+                    >
+                      <td className="px-4 py-3.5 whitespace-nowrap text-text-secondary font-medium">
+                        {new Date(log.timestampRequest).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap font-mono text-2xs text-text-muted">
+                        {log.requestId}
+                      </td>
+                      <td className="px-4 py-3.5 truncate max-w-xs font-medium">
+                        {log.inputPreview ?? '—'}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap select-none">
+                        <span
+                          className={[
+                            'inline-flex items-center rounded-full px-2 py-0.5 text-3xs font-semibold tracking-wide uppercase',
+                            log.status === 'success'
+                              ? 'bg-brand-secondary/15 text-brand-secondary'
+                              : log.status === 'timeout'
+                              ? 'bg-semantic-warning/15 text-semantic-warning'
+                              : 'bg-semantic-error/15 text-semantic-error',
+                          ].join(' ')}
+                        >
+                          {log.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap font-semibold text-brand-primary">
+                        {formatLatency(log.latencyMs)}
+                      </td>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-text-secondary font-medium">
+                        {log.totalTokens} <span className="text-2xs text-text-muted">({log.promptTokens}p/{log.completionTokens}c)</span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

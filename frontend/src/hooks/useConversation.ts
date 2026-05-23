@@ -80,11 +80,18 @@ export function useConversation() {
 
   const sendMessage = useCallback(
     async (content: string) => {
-      if (!activeConversationId) return
+      // Read live ID from the store — not the stale closure — so a just-created
+      // conversation is visible immediately without waiting for a re-render.
+      let conversationId = useConversationStore.getState().activeConversationId
+      if (!conversationId) {
+        await createNewConversation()
+        conversationId = useConversationStore.getState().activeConversationId
+        if (!conversationId) return
+      }
 
       const optimisticUserMsg: Message = {
         id: crypto.randomUUID(),
-        conversationId: activeConversationId,
+        conversationId,
         role: 'user',
         content,
         status: 'complete',
@@ -95,7 +102,7 @@ export function useConversation() {
       const assistantMsgId = crypto.randomUUID()
       const pendingAssistantMsg: Message = {
         id: assistantMsgId,
-        conversationId: activeConversationId,
+        conversationId,
         role: 'assistant',
         content: '',
         status: 'pending',
@@ -106,10 +113,10 @@ export function useConversation() {
 
       try {
         const { response } = await loggedLLMCall({
-          sessionId: activeConversationId,
+          sessionId: conversationId,
           providerId: DEFAULT_PROVIDER,
           request: {
-            sessionId: activeConversationId,
+            sessionId: conversationId,
             messages: [...messages, optimisticUserMsg].map((m) => ({
               role: m.role,
               content: m.content,
@@ -121,15 +128,15 @@ export function useConversation() {
         updateMessage(assistantMsgId, { content: response.content, status: 'complete' })
 
         // Persist both turns non-blocking — must not delay the UI response
-        addMessage(activeConversationId, 'user', content).catch(console.error)
-        addMessage(activeConversationId, 'assistant', response.content).catch(console.error)
+        addMessage(conversationId, 'user', content).catch(console.error)
+        addMessage(conversationId, 'assistant', response.content).catch(console.error)
       } catch {
         updateMessage(assistantMsgId, { status: 'error' })
       } finally {
         setSending(false)
       }
     },
-    [activeConversationId, messages, appendMessage, setSending, updateMessage],
+    [messages, appendMessage, setSending, updateMessage, createNewConversation],
   )
 
   return {

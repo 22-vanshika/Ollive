@@ -4,7 +4,7 @@ from app.core.exceptions import ConflictError
 from app.models.inference_log import InferenceLog
 from app.repositories import inference_log_repo
 from app.schemas.ingest import IngestRequest, IngestResponse
-from app.schemas.metrics import LatencyDataPoint, MetricsSummaryResponse
+from app.schemas.metrics import LatencyDataPoint, MetricsSummaryResponse, RecentLogEntry
 from app.services import pii_service
 
 
@@ -52,3 +52,8 @@ async def get_summary(session: AsyncSession) -> MetricsSummaryResponse:
 async def get_latency_series(session: AsyncSession) -> list[LatencyDataPoint]:
     rows = await inference_log_repo.get_latency_series(session)
     return [LatencyDataPoint(**row) for row in rows]
+
+
+async def get_recent_logs(session: AsyncSession) -> list[RecentLogEntry]:
+    rows = await inference_log_repo.get_recent_logs(session)
+    return [RecentLogEntry(**row) for row in rows]

@@ -17,7 +17,7 @@ export function ConversationList({
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="h-14 rounded-lg bg-neutral-200/50 animate-pulse border border-neutral-200/20"
+            className="h-14 rounded-lg bg-neutral-200/50 animate-pulse border border-border"
           />
         ))}
       </div>

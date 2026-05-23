@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { ConversationList, MessageBubble, ChatInput } from '@/components/chat'
 import { useConversation } from '@/hooks'
-import { useConversationStore } from '@/store'
 import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION } from '@/constants'
 
 export function ChatPage() {
@@ -72,20 +71,7 @@ export function ChatPage() {
     (c) => !pinnedIds.includes(c.id)
   )
 
-  // Suggestion card clicked -> create a conversation if needed, then send.
-  // We read the store directly after creation to get the new ID without waiting
-  // for a re-render, which avoids the stale-closure race condition.
-  const handleSuggestionClick = async (text: string) => {
-    if (!activeConversationId) {
-      try {
-        await createNewConversation()
-      } catch (err) {
-        console.error(err)
-        return
-      }
-    }
-    const currentId = useConversationStore.getState().activeConversationId
-    if (!currentId) return
+  const handleSuggestionClick = (text: string) => {
     sendMessage(text)
   }
 
@@ -240,7 +226,7 @@ export function ChatPage() {
       <main className="flex-1 flex flex-col min-w-0 h-full relative overflow-hidden bg-surface-base">
         {/* Slim Header Bar */}
         <header className="h-14 border-b border-border bg-surface-base px-6 flex items-center justify-between shrink-0 select-none">
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <span className="h-2 w-2 rounded-full bg-brand-secondary/80 shrink-0" />
             <h3 className="text-sm font-semibold text-text-primary truncate">
               {activeConversationId
@@ -263,7 +249,7 @@ export function ChatPage() {
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   stroke="currentColor"
                   className="w-4 h-4"
                 >
@@ -291,7 +277,7 @@ export function ChatPage() {
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
-                  strokeWidth="2"
+                  strokeWidth="1.5"
                   stroke="currentColor"
                   className="w-4 h-4"
                 >
@@ -389,7 +375,7 @@ export function ChatPage() {
         )}
 
         {/* Input box stays fixed at the bottom */}
-        <ChatInput onSend={sendMessage} disabled={isSending || !activeConversationId} />
+        <ChatInput onSend={sendMessage} disabled={isSending} />
       </main>
 
       {/* ─── Keyboard Shortcuts Modal Overlay ─── */}

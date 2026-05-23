@@ -29,9 +29,21 @@ export interface LatencyDataPoint {
   latencyMs: number
 }
 
+export interface RecentInferenceLog {
+  requestId: string
+  timestampRequest: string
+  latencyMs: number
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+  status: InferenceStatus
+  inputPreview: string | null
+}
+
 export interface UseInferenceMetricsResult {
   metrics: InferenceMetrics | null
   latencySeries: LatencyDataPoint[]
+  recentLogs: RecentInferenceLog[]
   isLoading: boolean
   error: string | null
 }

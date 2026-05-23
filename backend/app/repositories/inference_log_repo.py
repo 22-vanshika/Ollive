@@ -39,6 +39,24 @@ async def get_latency_series(
     ]
 
 
+async def get_recent_logs(session: AsyncSession, limit: int = 6) -> list[dict]:
+    result = await session.execute(
+        select(
+            InferenceLog.request_id,
+            InferenceLog.timestamp_request,
+            InferenceLog.latency_ms,
+            InferenceLog.prompt_tokens,
+            InferenceLog.completion_tokens,
+            InferenceLog.total_tokens,
+            InferenceLog.status,
+            InferenceLog.input_preview,
+        )
+        .order_by(InferenceLog.timestamp_request.desc())
+        .limit(limit)
+    )
+    return [row._asdict() for row in result.all()]
+
+
 async def get_summary_stats(session: AsyncSession) -> dict:
     result = await session.execute(
         select(

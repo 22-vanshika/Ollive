@@ -1,4 +1,4 @@
-import type { InferenceMetrics, LatencyDataPoint } from '@/types'
+import type { InferenceMetrics, LatencyDataPoint, RecentInferenceLog } from '@/types'
 import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT_MS } from '@/constants'
 
 export async function fetchMetrics(): Promise<InferenceMetrics> {
@@ -15,4 +15,12 @@ export async function fetchLatencyTimeSeries(): Promise<LatencyDataPoint[]> {
   })
   if (!response.ok) throw new Error(`Failed to fetch latency data: ${response.status}`)
   return response.json() as Promise<LatencyDataPoint[]>
+}
+
+export async function fetchRecentLogs(): Promise<RecentInferenceLog[]> {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.METRICS_RECENT}`, {
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+  })
+  if (!response.ok) throw new Error(`Failed to fetch recent logs: ${response.status}`)
+  return response.json() as Promise<RecentInferenceLog[]>
 }
