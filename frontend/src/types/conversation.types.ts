@@ -1,0 +1,44 @@
+export type MessageRole = 'user' | 'assistant' | 'system'
+
+export type MessageStatus = 'pending' | 'streaming' | 'complete' | 'error'
+
+export interface Message {
+  id: string
+  conversationId: string
+  role: MessageRole
+  content: string
+  status: MessageStatus
+  createdAt: string
+}
+
+export interface Conversation {
+  id: string
+  title: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ConversationDetail {
+  conversation: Conversation
+  messages: Message[]
+}
+
+// Raw API response shapes (snake_case from backend — consumed only by conversation.service.ts)
+export interface ApiConversation {
+  id: string
+  title: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ApiMessage {
+  id: string
+  conversation_id: string
+  role: MessageRole
+  content: string
+  created_at: string
+}
+
+export interface ApiConversationWithMessages extends ApiConversation {
+  messages: ApiMessage[]
+}
