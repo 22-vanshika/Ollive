@@ -17,7 +17,6 @@ export interface LoggerCallOptions {
 
 export interface LoggerCallResult {
   response: LLMResponse
-  log: InferenceLog
 }
 
 export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerCallResult> {
@@ -31,7 +30,6 @@ export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerC
   let status: InferenceStatus = 'success'
   let errorCode: string | null = null
   let response: LLMResponse | undefined
-  let log: InferenceLog | undefined
 
   try {
     response = await adapter.chat(request)
@@ -40,15 +38,13 @@ export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerC
     errorCode = err instanceof Error ? err.message : 'UNKNOWN_ERROR'
     throw err
   } finally {
-    // Compute response time and latency inside finally so a single timestamp
-    // covers both the success and error paths — no risk of an uninitialized variable.
+    // Build and ship the log in finally so latency is measured on both
+    // the success and error paths before any re-throw propagates.
     const timestampResponse = new Date().toISOString()
     const latencyMs = Date.now() - requestStart
+    const lastUserMessage = request.messages.findLast(m => m.role === 'user')?.content ?? ''
 
-    const lastUserMessage =
-      request.messages.findLast(m => m.role === 'user')?.content ?? ''
-
-    log = {
+    shipLog({
       sessionId,
       requestId,
       provider: providerId,
@@ -63,15 +59,12 @@ export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerC
       errorCode,
       inputPreview: redactPII(lastUserMessage).slice(0, INPUT_PREVIEW_LENGTH),
       outputPreview: redactPII(response?.content ?? '').slice(0, OUTPUT_PREVIEW_LENGTH),
-    }
-
-    shipLog(log)
+    })
   }
 
-  // response and log are both assigned before reaching here:
-  //   • response — assigned in try; if try threw, catch re-threw so we never reach this line
-  //   • log     — assigned in finally, which always runs before any return
-  return { response: response!, log: log! }
+  // If the try block threw, catch re-threw it — execution never reaches here on error.
+  // response is guaranteed to be assigned on the success path.
+  return { response: response as LLMResponse }
 }
 
 function shipLog(log: InferenceLog): void {

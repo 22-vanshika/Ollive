@@ -1,13 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMetrics, fetchLatencyTimeSeries } from '@/services'
-import type { InferenceMetrics, LatencyDataPoint } from '@/types'
-
-interface UseInferenceMetricsResult {
-  metrics: InferenceMetrics | null
-  latencySeries: LatencyDataPoint[]
-  isLoading: boolean
-  error: string | null
-}
+import type { InferenceMetrics, LatencyDataPoint, UseInferenceMetricsResult } from '@/types'
 
 export function useInferenceMetrics(): UseInferenceMetricsResult {
   const [metrics, setMetrics] = useState<InferenceMetrics | null>(null)

@@ -27,15 +27,6 @@ async def list_conversations(
     return [ConversationResponse.model_validate(c) for c in conversations]
 
 
-async def get_conversation(
-    session: AsyncSession, conversation_id: uuid.UUID
-) -> ConversationResponse:
-    conversation = await conversation_repo.get_by_id(session, conversation_id)
-    if conversation is None:
-        raise NotFoundError(f"Conversation {conversation_id} not found.")
-    return ConversationResponse.model_validate(conversation)
-
-
 async def get_conversation_with_messages(
     session: AsyncSession, conversation_id: uuid.UUID
 ) -> ConversationWithMessages:

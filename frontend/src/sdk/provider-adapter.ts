@@ -1,5 +1,5 @@
 import type { LLMRequest, LLMResponse } from '@/types'
-import { API_BASE_URL, API_TIMEOUT_MS } from '@/constants'
+import { API_BASE_URL, API_ENDPOINTS, API_TIMEOUT_MS, PROVIDER_IDS } from '@/constants'
 
 export interface ProviderAdapter {
   chat(request: LLMRequest): Promise<LLMResponse>
@@ -7,7 +7,7 @@ export interface ProviderAdapter {
 
 export function createProviderAdapter(providerId: string): ProviderAdapter {
   switch (providerId) {
-    case 'groq':
+    case PROVIDER_IDS.GROQ:
       return groqAdapter
     default:
       throw new Error(`Unknown provider: ${providerId}`)
@@ -19,7 +19,7 @@ const groqAdapter: ProviderAdapter = {
     // Delegates to the backend — the frontend never holds API keys.
     // AbortSignal.timeout lets the logger correctly classify a hung request as
     // 'timeout' (err.message includes "timeout") rather than generic 'error'.
-    const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.LLM_CHAT}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),

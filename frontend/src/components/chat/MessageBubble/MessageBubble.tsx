@@ -41,13 +41,13 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   if (isUser) {
     return (
       <div className="flex justify-end w-full mb-6 animate-message-fade-in">
-        <div className="max-w-[70%] flex flex-col items-end">
+        <div className="max-w-bubble-user flex flex-col items-end">
           {/* User Soft terracotta Bubble */}
-          <div className="rounded-[1.25rem] rounded-br-[0.375rem] px-5 py-3.5 bg-user-bubble-bg text-user-bubble-text text-[15px] font-sans leading-relaxed shadow-sm border border-brand-primary/5 select-text">
+          <div className="rounded-xl rounded-br-sm px-5 py-3.5 bg-user-bubble-bg text-user-bubble-text text-md font-sans leading-relaxed shadow-sm border border-brand-primary/5 select-text">
             {message.content}
           </div>
           {/* Timestamp */}
-          <span className="text-[10px] text-text-muted mt-1 px-1 font-sans">
+          <span className="text-2xs text-text-muted mt-1 px-1 font-sans">
             {new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
@@ -58,7 +58,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   // Assistant Message Layout (No bubble background, sits on page bg, elegant avatar)
   return (
     <div className="flex justify-start w-full mb-8 group animate-message-fade-in">
-      <div className="flex gap-4 max-w-[85%] items-start">
+      <div className="flex gap-4 max-w-bubble-assistant items-start">
         {/* Warm Premium Logo Avatar */}
         <div className="h-9 w-9 rounded-full bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary font-serif font-bold text-sm select-none shrink-0 mt-0.5 shadow-sm">
           O
@@ -66,7 +66,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
         {/* Content Box */}
         <div className="flex flex-col gap-1.5 min-w-0">
-          <div className="text-[15px] text-text-primary leading-[1.7] font-sans font-normal select-text whitespace-pre-wrap">
+          <div className="text-md text-text-primary leading-chat font-sans font-normal select-text whitespace-pre-wrap">
             {message.status === 'pending' ? (
               /* Terracotta Typing dots */
               <div className="flex items-center gap-1.5 px-1 py-3 select-none">
@@ -85,9 +85,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
           {/* Metadata & Actions row (only visible on hover or completed messages) */}
           {message.status === 'complete' && (
-            <div className="flex items-center justify-between mt-2 py-1 border-t border-border/40 min-h-[28px] gap-4">
+            <div className="flex items-center justify-between mt-2 py-1 border-t border-border/40 min-h-input gap-4">
               {/* Latency & Token stats */}
-              <div className="flex items-center gap-3 text-[11px] text-text-muted font-sans tracking-wide select-none">
+              <div className="flex items-center gap-3 text-xs text-text-muted font-sans tracking-wide select-none">
                 <span className="flex items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-text-muted/70">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />

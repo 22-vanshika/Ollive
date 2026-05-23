@@ -18,14 +18,3 @@ async def create(
     await session.flush()
     await session.refresh(message)
     return message
-
-
-async def list_by_conversation(
-    session: AsyncSession, conversation_id: uuid.UUID
-) -> list[Message]:
-    result = await session.execute(
-        select(Message)
-        .where(Message.conversation_id == conversation_id)
-        .order_by(Message.created_at)
-    )
-    return list(result.scalars().all())

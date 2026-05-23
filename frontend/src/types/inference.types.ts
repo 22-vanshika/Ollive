@@ -28,3 +28,10 @@ export interface LatencyDataPoint {
   timestamp: string
   latencyMs: number
 }
+
+export interface UseInferenceMetricsResult {
+  metrics: InferenceMetrics | null
+  latencySeries: LatencyDataPoint[]
+  isLoading: boolean
+  error: string | null
+}

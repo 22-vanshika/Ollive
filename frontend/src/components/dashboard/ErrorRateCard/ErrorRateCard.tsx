@@ -41,7 +41,7 @@ export function ErrorRateCard({ errorRate, isLoading }: ErrorRateCardProps) {
         <div className="flex justify-between items-start">
           <div className="flex flex-col">
             {/* Muted label above */}
-            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider mb-1 font-sans">
+            <span className="text-2xs font-semibold text-text-muted uppercase tracking-wider mb-1 font-sans">
               Error Rate
             </span>
             {/* Terracotta value */}
@@ -54,7 +54,7 @@ export function ErrorRateCard({ errorRate, isLoading }: ErrorRateCardProps) {
         </div>
 
         {/* Supporting description text */}
-        <p className="text-[11px] text-text-secondary mt-3 font-sans leading-relaxed">
+        <p className="text-xs text-text-secondary mt-3 font-sans leading-relaxed">
           {errorRate === null
             ? 'No operational data logged yet.'
             : isHigh

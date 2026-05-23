@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { ConversationList, MessageBubble, ChatInput } from '@/components/chat'
 import { useConversation } from '@/hooks'
+import { useConversationStore } from '@/store'
 import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION } from '@/constants'
 
 export function ChatPage() {
@@ -71,22 +72,20 @@ export function ChatPage() {
     (c) => !pinnedIds.includes(c.id)
   )
 
-  // Suggestion card clicked -> start chat or send
+  // Suggestion card clicked -> create a conversation if needed, then send.
+  // We read the store directly after creation to get the new ID without waiting
+  // for a re-render, which avoids the stale-closure race condition.
   const handleSuggestionClick = async (text: string) => {
-    let currentId = activeConversationId
-    if (!currentId) {
-      // Create new exploration first
+    if (!activeConversationId) {
       try {
         await createNewConversation()
-        // The store is updated, but our local closure doesn't have the new ID immediately.
-        // Zustand will update activeConversationId on the next render.
-        // We will pass the text to a temporary listener or set it in textarea.
       } catch (err) {
         console.error(err)
         return
       }
     }
-    // We send message directly if a conversation is active
+    const currentId = useConversationStore.getState().activeConversationId
+    if (!currentId) return
     sendMessage(text)
   }
 
@@ -114,7 +113,7 @@ export function ChatPage() {
   return (
     <div className="flex h-full w-full bg-surface-base select-none overflow-hidden font-sans">
       {/* ─── Sidebar (Left Zone) ─── */}
-      <aside className="w-[280px] border-r border-border bg-surface-overlay flex flex-col shrink-0 h-full overflow-hidden select-none">
+      <aside className="w-sidebar border-r border-border bg-surface-overlay flex flex-col shrink-0 h-full overflow-hidden select-none">
         {/* Sidebar Header */}
         <div className="px-6 py-4 flex flex-col gap-3 shrink-0">
           <div className="flex items-center justify-between">
@@ -173,7 +172,7 @@ export function ChatPage() {
           {/* Pinned Exploration Section */}
           {pinnedConversations.length > 0 && (
             <div>
-              <div className="px-4 py-1.5 text-[10px] font-semibold text-brand-secondary tracking-wider uppercase select-none">
+              <div className="px-4 py-1.5 text-2xs font-semibold text-brand-secondary tracking-wider uppercase select-none">
                 Pinned
               </div>
               <ConversationList
@@ -191,7 +190,7 @@ export function ChatPage() {
           {/* Recent Exploration Section */}
           <div>
             {pinnedConversations.length > 0 && (
-              <div className="px-4 py-1.5 text-[10px] font-semibold text-text-muted tracking-wider uppercase select-none">
+              <div className="px-4 py-1.5 text-2xs font-semibold text-text-muted tracking-wider uppercase select-none">
                 Recent
               </div>
             )}
@@ -208,7 +207,7 @@ export function ChatPage() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="px-6 py-4 border-t border-border/60 bg-surface-overlay/80 shrink-0 text-[11px] text-text-muted flex justify-between items-center select-none">
+        <div className="px-6 py-4 border-t border-border/60 bg-surface-overlay/80 shrink-0 text-xs text-text-muted flex justify-between items-center select-none">
           <a
             href="#documentation"
             onClick={(e) => {
@@ -355,7 +354,7 @@ export function ChatPage() {
                             </svg>
                           )}
                         </div>
-                        <span className="text-[14px] font-semibold text-text-primary">
+                        <span className="text-sm font-semibold text-text-primary">
                           {s.title}
                         </span>
                       </div>
@@ -371,7 +370,7 @@ export function ChatPage() {
         ) : isLoadingMessages ? (
           /* Loading State */
           <div className="flex-1 flex flex-col items-center justify-center select-none gap-3">
-            <div className="h-6 w-6 rounded-full border-[2.5px] border-brand-primary/20 border-t-brand-primary animate-spin" />
+            <div className="h-6 w-6 rounded-full border-2 border-brand-primary/20 border-t-brand-primary animate-spin" />
             <p className="text-text-muted text-xs tracking-wide">Synthesizing exploration…</p>
           </div>
         ) : (
@@ -395,7 +394,7 @@ export function ChatPage() {
 
       {/* ─── Keyboard Shortcuts Modal Overlay ─── */}
       {showShortcuts && (
-        <div className="absolute inset-0 bg-neutral-900/40 backdrop-blur-[1px] flex items-center justify-center z-[1100] animate-message-fade-in p-6">
+        <div className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm flex items-center justify-center z-modal animate-message-fade-in p-6">
           <div className="bg-surface-raised border border-border shadow-lg rounded-xl max-w-sm w-full p-6 relative">
             {/* Close Button */}
             <button
@@ -414,7 +413,7 @@ export function ChatPage() {
               </svg>
             </button>
 
-            <h4 className="font-serif text-[16px] font-bold text-text-primary mb-4 flex items-center gap-2">
+            <h4 className="font-serif text-base font-bold text-text-primary mb-4 flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -436,25 +435,25 @@ export function ChatPage() {
             <div className="flex flex-col gap-3 font-sans text-xs text-text-secondary mt-4">
               <div className="flex justify-between items-center py-1.5 border-b border-border/50">
                 <span>Send message</span>
-                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-[9px]">
+                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-3xs">
                   Enter
                 </kbd>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-border/50">
                 <span>Add new line</span>
-                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-[9px]">
+                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-3xs">
                   Shift + Enter
                 </kbd>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-border/50">
                 <span>Markdown Bold</span>
-                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-[9px]">
+                <kbd className="px-2 py-1 rounded bg-neutral-200 border border-neutral-300 font-mono text-3xs">
                   **text**
                 </kbd>
               </div>
               <div className="flex justify-between items-center py-1.5">
                 <span>Export Chat</span>
-                <span className="text-[10px] text-text-muted font-normal">
+                <span className="text-2xs text-text-muted font-normal">
                   Use top header icon
                 </span>
               </div>

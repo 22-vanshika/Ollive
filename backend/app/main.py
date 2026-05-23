@@ -3,10 +3,15 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from app.api.router import router
 from app.core.config import get_settings
 from app.core.exceptions import OlliveError
+
+
+class HealthResponse(BaseModel):
+    status: str
 
 _settings = get_settings()
 
@@ -40,9 +45,9 @@ def create_app() -> FastAPI:
             content={"detail": exc.message},
         )
 
-    @app.get("/health", tags=["health"], include_in_schema=False)
-    async def _health() -> dict:
-        return {"status": "ok"}
+    @app.get("/health", response_model=HealthResponse, tags=["health"], include_in_schema=False)
+    async def _health() -> HealthResponse:
+        return HealthResponse(status="ok")
 
     app.include_router(router)
 

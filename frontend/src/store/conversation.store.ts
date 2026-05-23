@@ -1,23 +1,5 @@
 import { create } from 'zustand'
-import type { Conversation, Message } from '@/types'
-
-interface ConversationState {
-  conversations: Conversation[]
-  activeConversationId: string | null
-  messages: Message[]
-  isLoadingConversations: boolean
-  isLoadingMessages: boolean
-  isSending: boolean
-
-  setConversations: (conversations: Conversation[]) => void
-  setActiveConversation: (id: string | null) => void
-  setMessages: (messages: Message[]) => void
-  appendMessage: (message: Message) => void
-  updateMessage: (id: string, patch: Partial<Message>) => void
-  setLoadingConversations: (loading: boolean) => void
-  setLoadingMessages: (loading: boolean) => void
-  setSending: (sending: boolean) => void
-}
+import type { ConversationState } from '@/types'
 
 export const useConversationStore = create<ConversationState>((set) => ({
   conversations: [],

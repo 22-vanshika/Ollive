@@ -54,7 +54,7 @@ export function LatencyChart({ data, isLoading }: LatencyChartProps) {
         <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">
           Latency Over Time
         </h3>
-        <span className="text-[10px] text-text-muted font-sans font-medium bg-neutral-200/40 px-2 py-0.5 rounded">
+        <span className="text-2xs text-text-muted font-sans font-medium bg-neutral-200/40 px-2 py-0.5 rounded">
           Max: {formatLatency(maxLatency)}
         </span>
       </div>
@@ -140,10 +140,10 @@ export function LatencyChart({ data, isLoading }: LatencyChartProps) {
       </div>
 
       {/* Axis Guide Row */}
-      <div className="flex justify-between items-center mt-2.5 text-[9px] text-text-muted font-sans font-medium px-1.5 uppercase tracking-wider">
-        <span>{new Date(pointsToRender[0]?.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+      <div className="flex justify-between items-center mt-2.5 text-3xs text-text-muted font-sans font-medium px-1.5 uppercase tracking-wider">
+        <span>{new Date(pointsToRender[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         <span>Operational Log Feed Timeline</span>
-        <span>{new Date(pointsToRender[pointsToRender.length - 1]?.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <span>{new Date(pointsToRender[pointsToRender.length - 1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
       </div>
     </div>
   )

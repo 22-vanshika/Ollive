@@ -1,41 +1,31 @@
+import { useMemo } from 'react'
 import { LatencyChart, ErrorRateCard, StatCard } from '@/components/dashboard'
 import { useInferenceMetrics } from '@/hooks'
+import { DASHBOARD_RECENT_INPUT_SAMPLES } from '@/constants'
 import { formatLatency, formatTokenCount } from '@/utils'
 
 export function DashboardPage() {
   const { metrics, latencySeries, isLoading, error } = useInferenceMetrics()
 
-  // Generate high-fidelity logs from actual database latency timeline points
-  const getRecentRequests = () => {
+  const recentRequestsList = useMemo(() => {
     if (!latencySeries.length) return []
     return latencySeries.slice(-6).reverse().map((point, index) => {
-      // Produce stable pseudo-random details based on the point's timestamp string
       let hash = 0
       for (let i = 0; i < point.timestamp.length; i++) {
         hash = point.timestamp.charCodeAt(i) + ((hash << 5) - hash)
       }
       const seed = Math.abs(hash)
-      
+
       const promptTokens = 110 + (seed % 120)
       const completionTokens = 35 + (seed % 75)
       const totalTokens = promptTokens + completionTokens
-      
-      // Mapped status categories
+
       let status: 'success' | 'error' | 'timeout' = 'success'
       if (point.latencyMs > 3200) {
         status = 'timeout'
       } else if (seed % 11 === 0) {
         status = 'error'
       }
-
-      const inputSample = [
-        'How does async IO work in FastAPI?',
-        'Redesign premium SaaS dashboard layout',
-        'Compare Groq Llama-3.3 vs Claude-3.5 latency',
-        'Create a warm editorial palette token file',
-        'Help me redact PII from this inference logger payload',
-        'Draft an API endpoint to ingest telemetry data',
-      ][seed % 6]
 
       return {
         id: `req-${point.timestamp.slice(-5)}-${index}`,
@@ -45,12 +35,10 @@ export function DashboardPage() {
         completionTokens,
         totalTokens,
         status,
-        input: inputSample,
+        input: DASHBOARD_RECENT_INPUT_SAMPLES[seed % DASHBOARD_RECENT_INPUT_SAMPLES.length],
       }
     })
-  }
-
-  const recentRequestsList = getRecentRequests()
+  }, [latencySeries])
 
   if (error) {
     return (
@@ -121,7 +109,7 @@ export function DashboardPage() {
               <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">
                 Recent Inference Telemetry
               </h3>
-              <span className="text-[9px] text-text-muted bg-neutral-200/40 px-2 py-0.5 rounded font-sans tracking-wide">
+              <span className="text-3xs text-text-muted bg-neutral-200/40 px-2 py-0.5 rounded font-sans tracking-wide">
                 Live Feed
               </span>
             </div>
@@ -129,7 +117,7 @@ export function DashboardPage() {
             {/* Alternating Row Table */}
             <div className="overflow-x-auto w-full border border-border/60 rounded-lg">
               <table className="min-w-full divide-y divide-border/60 text-left font-sans text-xs select-text">
-                <thead className="bg-surface-overlay text-text-secondary font-semibold text-[10px] uppercase tracking-wider select-none">
+                <thead className="bg-surface-overlay text-text-secondary font-semibold text-2xs uppercase tracking-wider select-none">
                   <tr>
                     <th className="px-4 py-3">Timestamp</th>
                     <th className="px-4 py-3">Request ID</th>
@@ -155,7 +143,7 @@ export function DashboardPage() {
                           {new Date(req.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </td>
                         {/* Request ID */}
-                        <td className="px-4 py-3.5 whitespace-nowrap font-mono text-[10px] text-text-muted">
+                        <td className="px-4 py-3.5 whitespace-nowrap font-mono text-2xs text-text-muted">
                           {req.id}
                         </td>
                         {/* Input Preview */}
@@ -166,7 +154,7 @@ export function DashboardPage() {
                         <td className="px-4 py-3.5 whitespace-nowrap select-none">
                           <span
                             className={[
-                              'inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wide uppercase',
+                              'inline-flex items-center rounded-full px-2 py-0.5 text-3xs font-semibold tracking-wide uppercase',
                               req.status === 'success'
                                 ? 'bg-brand-secondary/15 text-brand-secondary'
                                 : req.status === 'timeout'
@@ -183,7 +171,7 @@ export function DashboardPage() {
                         </td>
                         {/* Tokens */}
                         <td className="px-4 py-3.5 whitespace-nowrap text-text-secondary font-medium">
-                          {req.totalTokens} <span className="text-[10px] text-text-muted">({req.promptTokens}p/{req.completionTokens}c)</span>
+                          {req.totalTokens} <span className="text-2xs text-text-muted">({req.promptTokens}p/{req.completionTokens}c)</span>
                         </td>
                       </tr>
                     )

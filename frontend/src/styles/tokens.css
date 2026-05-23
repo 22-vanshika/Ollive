@@ -45,13 +45,17 @@
   --font-family-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --font-family-serif: 'Fraunces', Georgia, serif;
   --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-size-xs: 0.75rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
+  --font-size-3xs: 0.5625rem;   /* 9px  — micro labels (live feed badge, kbd hints) */
+  --font-size-2xs: 0.625rem;    /* 10px — table headers, sidebar section labels      */
+  --font-size-xs: 0.75rem;      /* 12px — secondary metadata, timestamps             */
+  --font-size-sm: 0.875rem;     /* 14px — UI labels, button text                     */
+  --font-size-md: 0.9375rem;    /* 15px — chat message body text                     */
+  --font-size-base: 1rem;       /* 16px — page-level prose                           */
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.625rem;
   --font-size-3xl: 2.25rem;
+  --line-height-chat: 1.7;      /* comfortable reading rhythm for message content    */
 
   /* ─── Spacing ────────────────────────────────────────────────────────────── */
   --spacing-1: 0.25rem;
@@ -66,6 +70,16 @@
   --spacing-16: 4rem;
   --spacing-20: 5rem;
   --spacing-24: 6rem;
+
+  /* ─── Component Sizing ───────────────────────────────────────────────────── */
+  --sidebar-width: 17.5rem;      /* 280px — main conversation sidebar             */
+  --input-min-height: 1.75rem;   /* 28px  — textarea minimum height               */
+  --input-max-height: 7.5rem;    /* 120px — textarea maximum height               */
+  --bubble-max-width-user: 70%;  /* user bubble max width (right-aligned)         */
+  --bubble-max-width-assistant: 85%; /* assistant bubble max width (left-aligned) */
+
+  /* ─── Border Widths ──────────────────────────────────────────────────────── */
+  --border-width-accent: 3px;    /* active conversation left border indicator     */
 
   /* ─── Border Radius ──────────────────────────────────────────────────────── */
   --radius-sm: 0.375rem;
@@ -110,7 +124,7 @@
     --color-surface-raised: #251E1A;  /* Soft Warm Cocoa Card */
     --color-surface-overlay: var(--color-neutral-100);
     --color-surface-sidebar-active: #2E2420;
-    --color-user-bubble-bg: rgba(210, 126, 100, 0.12);
+    --color-user-bubble-bg: color-mix(in srgb, var(--color-brand-primary) 12%, transparent);
     --color-user-bubble-text: var(--color-brand-primary);
 
     --color-text-primary: var(--color-neutral-900);

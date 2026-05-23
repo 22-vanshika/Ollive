@@ -1,6 +1,6 @@
-type Rule = { pattern: RegExp; label: string }
+import type { PiiRule } from '@/types'
 
-const RULES: Rule[] = [
+const RULES: PiiRule[] = [
   // Email addresses
   {
     pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,

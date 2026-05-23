@@ -46,8 +46,8 @@ const config: Config = {
           strong: 'var(--color-border-strong)',
         },
         user: {
-          bubbleBg: 'var(--color-user-bubble-bg)',
-          bubbleText: 'var(--color-user-bubble-text)',
+          'bubble-bg': 'var(--color-user-bubble-bg)',
+          'bubble-text': 'var(--color-user-bubble-text)',
         },
       },
       fontFamily: {
@@ -56,13 +56,35 @@ const config: Config = {
         mono: ['var(--font-family-mono)'],
       },
       fontSize: {
+        '3xs': 'var(--font-size-3xs)',
+        '2xs': 'var(--font-size-2xs)',
         xs: 'var(--font-size-xs)',
         sm: 'var(--font-size-sm)',
+        md: 'var(--font-size-md)',
         base: 'var(--font-size-base)',
         lg: 'var(--font-size-lg)',
         xl: 'var(--font-size-xl)',
         '2xl': 'var(--font-size-2xl)',
         '3xl': 'var(--font-size-3xl)',
+      },
+      lineHeight: {
+        chat: 'var(--line-height-chat)',
+      },
+      width: {
+        sidebar: 'var(--sidebar-width)',
+      },
+      maxWidth: {
+        'bubble-user': 'var(--bubble-max-width-user)',
+        'bubble-assistant': 'var(--bubble-max-width-assistant)',
+      },
+      minHeight: {
+        input: 'var(--input-min-height)',
+      },
+      maxHeight: {
+        input: 'var(--input-max-height)',
+      },
+      borderWidth: {
+        accent: 'var(--border-width-accent)',
       },
       spacing: {
         1: 'var(--spacing-1)',

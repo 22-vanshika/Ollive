@@ -42,3 +42,21 @@ export interface ApiMessage {
 export interface ApiConversationWithMessages extends ApiConversation {
   messages: ApiMessage[]
 }
+
+export interface ConversationState {
+  conversations: Conversation[]
+  activeConversationId: string | null
+  messages: Message[]
+  isLoadingConversations: boolean
+  isLoadingMessages: boolean
+  isSending: boolean
+
+  setConversations: (conversations: Conversation[]) => void
+  setActiveConversation: (id: string | null) => void
+  setMessages: (messages: Message[]) => void
+  appendMessage: (message: Message) => void
+  updateMessage: (id: string, patch: Partial<Message>) => void
+  setLoadingConversations: (loading: boolean) => void
+  setLoadingMessages: (loading: boolean) => void
+  setSending: (sending: boolean) => void
+}

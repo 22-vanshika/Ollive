@@ -1,11 +1,15 @@
+import type { WelcomeSuggestion } from '@/types'
+
 export const UNTITLED_CONVERSATION = 'Untitled exploration'
 
-export interface WelcomeSuggestion {
-  id: string
-  title: string
-  description: string
-  category: 'creative' | 'analytical' | 'technical' | 'editorial'
-}
+export const DASHBOARD_RECENT_INPUT_SAMPLES: readonly string[] = [
+  'How does async IO work in FastAPI?',
+  'Redesign premium SaaS dashboard layout',
+  'Compare Groq Llama-3.3 vs Claude-3.5 latency',
+  'Create a warm editorial palette token file',
+  'Help me redact PII from this inference logger payload',
+  'Draft an API endpoint to ingest telemetry data',
+] as const
 
 export const WELCOME_SUGGESTIONS: WelcomeSuggestion[] = [
   {

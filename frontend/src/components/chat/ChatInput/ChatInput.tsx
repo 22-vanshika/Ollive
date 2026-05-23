@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import type { ChatInputProps } from './ChatInput.types'
 import { DEFAULT_MODEL } from '@/constants'
 
+const INPUT_MAX_HEIGHT_PX = 120
+
 export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -31,7 +33,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     if (!textarea) return
 
     textarea.style.height = 'auto'
-    const newHeight = Math.min(textarea.scrollHeight, 120)
+    const newHeight = Math.min(textarea.scrollHeight, INPUT_MAX_HEIGHT_PX)
     textarea.style.height = `${newHeight}px`
   }, [value])
 
@@ -55,7 +57,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             disabled={disabled}
             rows={1}
             placeholder="Explore new ideas, search logs, write drafts..."
-            className="flex-1 resize-none bg-transparent py-1 px-1.5 text-[15px] leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none min-h-[28px] max-h-[120px] custom-scrollbar select-text"
+            className="flex-1 resize-none bg-transparent py-1 px-1.5 text-md leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none min-h-input max-h-input custom-scrollbar select-text"
           />
 
           {/* Terracotta send button with press shrink scaling */}
@@ -77,7 +79,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
               viewBox="0 0 24 24"
               strokeWidth="2.5"
               stroke="currentColor"
-              className="w-4 h-4 translate-x-[0.5px]"
+              className="w-4 h-4"
             >
               <path
                 strokeLinecap="round"
@@ -89,7 +91,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
         </div>
 
         {/* Info Row: character count & model name */}
-        <div className="flex justify-between items-center text-[10px] text-text-muted font-sans border-t border-border/40 pt-2 px-1">
+        <div className="flex justify-between items-center text-2xs text-text-muted font-sans border-t border-border/40 pt-2 px-1">
           <div className="flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-secondary/80 animate-pulse" />
             <span className="tracking-wide">Active Model: {getFriendlyModelName()}</span>

@@ -14,15 +14,6 @@ async def save(session: AsyncSession, log: InferenceLog) -> InferenceLog:
     return log
 
 
-async def get_by_id(
-    session: AsyncSession, log_id: uuid.UUID
-) -> InferenceLog | None:
-    result = await session.execute(
-        select(InferenceLog).where(InferenceLog.id == log_id)
-    )
-    return result.scalar_one_or_none()
-
-
 async def get_by_request_id(
     session: AsyncSession, request_id: uuid.UUID
 ) -> InferenceLog | None:
@@ -30,28 +21,6 @@ async def get_by_request_id(
         select(InferenceLog).where(InferenceLog.request_id == request_id)
     )
     return result.scalar_one_or_none()
-
-
-async def list_by_conversation(
-    session: AsyncSession, conversation_id: uuid.UUID
-) -> list[InferenceLog]:
-    result = await session.execute(
-        select(InferenceLog)
-        .where(InferenceLog.conversation_id == conversation_id)
-        .order_by(InferenceLog.created_at.desc())
-    )
-    return list(result.scalars().all())
-
-
-async def list_by_session(
-    session: AsyncSession, session_id: uuid.UUID
-) -> list[InferenceLog]:
-    result = await session.execute(
-        select(InferenceLog)
-        .where(InferenceLog.session_id == session_id)
-        .order_by(InferenceLog.created_at.desc())
-    )
-    return list(result.scalars().all())
 
 
 async def get_latency_series(

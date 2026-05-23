@@ -51,8 +51,8 @@ export function ConversationList({
               className={[
                 'w-full text-left px-4 py-3 flex flex-col justify-center transition-all duration-base cursor-pointer',
                 isActive
-                  ? 'bg-surface-sidebarActive border-l-[3px] border-brand-primary pl-3.5'
-                  : 'hover:bg-neutral-200/30 border-l-[3px] border-transparent',
+                  ? 'bg-surface-sidebarActive border-l-accent border-brand-primary pl-3.5'
+                  : 'hover:bg-neutral-200/30 border-l-accent border-transparent',
               ].join(' ')}
             >
               <div className="flex items-center justify-between w-full gap-2">

@@ -24,19 +24,18 @@
     overflow: hidden; /* Prevent overall page scrolling */
   }
 
-  /* Focus ring overrides globally using terracotta at 40% opacity */
+  /* Focus ring overrides globally using brand-primary at 40% opacity */
   *:focus-visible {
     outline: none !important;
-    ring-color: rgba(201, 111, 83, 0.4) !important;
-    box-shadow: 0 0 0 3px rgba(201, 111, 83, 0.4) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand-primary) 40%, transparent) !important;
   }
 }
 
 @layer utilities {
-  /* Thin custom scrollbar styled with warm beige track and translucent terracotta thumb */
+  /* Thin custom scrollbar styled with warm beige track and translucent brand thumb */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(201, 111, 83, 0.15) transparent;
+    scrollbar-color: color-mix(in srgb, var(--color-brand-primary) 15%, transparent) transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -49,13 +48,13 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(201, 111, 83, 0.15);
+    background: color-mix(in srgb, var(--color-brand-primary) 15%, transparent);
     border-radius: var(--radius-full);
     transition: background var(--transition-fast) ease;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(201, 111, 83, 0.3);
+    background: color-mix(in srgb, var(--color-brand-primary) 30%, transparent);
   }
 
   /* Micro-interactions & animations */
