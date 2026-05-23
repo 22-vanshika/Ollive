@@ -28,6 +28,7 @@ async def get_latency_series(
 ) -> list[dict]:
     result = await session.execute(
         select(InferenceLog.timestamp_request, InferenceLog.latency_ms)
+        .where(InferenceLog.conversation_id.is_not(None))
         .order_by(InferenceLog.timestamp_request.desc())
         .limit(limit)
     )
@@ -51,6 +52,7 @@ async def get_recent_logs(session: AsyncSession, limit: int = 6) -> list[dict]:
             InferenceLog.status,
             InferenceLog.input_preview,
         )
+        .where(InferenceLog.conversation_id.is_not(None))
         .order_by(InferenceLog.timestamp_request.desc())
         .limit(limit)
     )
@@ -66,7 +68,7 @@ async def get_summary_stats(session: AsyncSession) -> dict:
             func.count(InferenceLog.id)
             .filter(InferenceLog.status.in_(["error", "timeout"]))
             .label("non_success_count"),
-        )
+        ).where(InferenceLog.conversation_id.is_not(None))
     )
     row = result.one()
     total = row.total_requests or 0

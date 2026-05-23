@@ -19,6 +19,7 @@ async def ingest_log(session: AsyncSession, payload: IngestRequest) -> IngestRes
     output_preview = pii_service.redact(payload.output_preview) if payload.output_preview else None
 
     log = InferenceLog(
+        conversation_id=payload.session_id,
         session_id=payload.session_id,
         request_id=payload.request_id,
         provider=payload.provider,

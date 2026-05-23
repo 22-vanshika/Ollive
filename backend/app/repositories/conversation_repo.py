@@ -63,6 +63,14 @@ async def delete(session: AsyncSession, conversation_id: uuid.UUID) -> bool:
     conversation = await get_by_id(session, conversation_id)
     if conversation is None:
         return False
+    
+    # Cascade delete to inference logs directly to clear them and trigger live updates
+    from sqlalchemy import delete as sql_delete
+    from app.models.inference_log import InferenceLog
+    await session.execute(
+        sql_delete(InferenceLog).where(InferenceLog.conversation_id == conversation_id)
+    )
+    
     await session.delete(conversation)
     await session.flush()
     return True
