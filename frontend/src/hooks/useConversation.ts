@@ -6,9 +6,10 @@ import {
   fetchConversationWithMessages,
   addMessage,
   deleteConversation as deleteConversationService,
+  updateConversationTitle,
 } from '@/services'
 import { loggedLLMCall } from '@/sdk'
-import { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_PROVIDER } from '@/constants'
+import { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_PROVIDER, UNTITLED_CONVERSATION } from '@/constants'
 import type { Message } from '@/types'
 
 export function useConversation() {
@@ -124,12 +125,77 @@ export function useConversation() {
             model: DEFAULT_MODEL,
             maxTokens: DEFAULT_MAX_TOKENS,
           },
+          onChunk: (chunk) => {
+            const currentMsgs = useConversationStore.getState().messages
+            const targetMsg = currentMsgs.find((m) => m.id === assistantMsgId)
+            const currentContent = targetMsg ? targetMsg.content : ''
+            updateMessage(assistantMsgId, {
+              content: currentContent + chunk,
+              status: 'pending',
+            })
+          },
         })
         updateMessage(assistantMsgId, { content: response.content, status: 'complete' })
 
         // Persist both turns non-blocking — must not delay the UI response
         addMessage(conversationId, 'user', content).catch(console.error)
         addMessage(conversationId, 'assistant', response.content).catch(console.error)
+
+        // Non-blocking auto-generation of conversation title
+        const currentConv = useConversationStore.getState().conversations.find((c) => c.id === conversationId)
+        const isUntitled = !currentConv || !currentConv.title || currentConv.title === UNTITLED_CONVERSATION
+        const finalMsgs = useConversationStore.getState().messages
+        if (finalMsgs.length >= 2 && conversationId && isUntitled) {
+          const currentConvId = conversationId
+          const userQuery = content
+          const assistantReply = response.content
+
+          ;(async () => {
+            try {
+              const { response: summaryResponse } = await loggedLLMCall({
+                sessionId: currentConvId,
+                providerId: DEFAULT_PROVIDER,
+                request: {
+                  sessionId: currentConvId,
+                  messages: [
+                    { role: 'user', content: userQuery },
+                    { role: 'assistant', content: assistantReply },
+                    {
+                      role: 'user',
+                      content:
+                        'Summarize this conversation in 4 words or fewer. Reply with only the title, no punctuation.',
+                    },
+                  ],
+                  model: DEFAULT_MODEL,
+                  maxTokens: 50,
+                },
+              })
+
+              let title = summaryResponse.content.trim()
+              if (title.startsWith('"') && title.endsWith('"')) {
+                title = title.slice(1, -1).trim()
+              }
+              if (title.startsWith("'") && title.endsWith("'")) {
+                title = title.slice(1, -1).trim()
+              }
+              if (title.endsWith('.')) {
+                title = title.slice(0, -1).trim()
+              }
+
+              if (title) {
+                await updateConversationTitle(currentConvId, title)
+
+                const currentConversations = useConversationStore.getState().conversations
+                const updatedConversations = currentConversations.map((c) =>
+                  c.id === currentConvId ? { ...c, title } : c
+                )
+                useConversationStore.getState().setConversations(updatedConversations)
+              }
+            } catch (err) {
+              console.error('Failed to auto-generate conversation title:', err)
+            }
+          })()
+        }
       } catch {
         updateMessage(assistantMsgId, { status: 'error' })
       } finally {

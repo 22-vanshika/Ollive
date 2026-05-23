@@ -4,13 +4,13 @@ import { formatLatency } from '@/utils'
 export function LatencyChart({ data, isLoading }: LatencyChartProps) {
   if (isLoading) {
     return (
-      <div className="h-64 rounded-xl bg-neutral-200/50 animate-pulse border border-neutral-200/20" />
+      <div className="h-full min-h-[280px] rounded-xl bg-neutral-200/50 animate-pulse border border-neutral-200/20" />
     )
   }
 
   if (data.length === 0) {
     return (
-      <div className="h-64 flex flex-col items-center justify-center rounded-xl bg-surface-raised border border-border select-none p-6 text-center">
+      <div className="h-full min-h-[280px] flex flex-col items-center justify-center rounded-xl bg-surface-raised border border-border select-none p-6 text-center">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-8 h-8 text-text-muted/60 mb-2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18" />
         </svg>
@@ -49,7 +49,7 @@ export function LatencyChart({ data, isLoading }: LatencyChartProps) {
     : ''
 
   return (
-    <div className="rounded-xl bg-surface-raised border border-border shadow-sm p-5 hover:shadow-md transition-all duration-base flex flex-col select-none">
+    <div className="h-full rounded-xl bg-surface-raised border border-border shadow-sm p-5 hover:shadow-md transition-all duration-base flex flex-col select-none">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xs font-semibold text-text-secondary uppercase tracking-wider font-sans">
           Latency Over Time
@@ -60,11 +60,10 @@ export function LatencyChart({ data, isLoading }: LatencyChartProps) {
       </div>
 
       {/* SVG Canvas Container */}
-      <div className="relative w-full h-44 bg-surface-base/30 rounded-lg p-2 border border-border/40 overflow-hidden">
+      <div className="relative w-full flex-1 min-h-[180px] bg-surface-base/30 rounded-lg p-3 border border-border/40 overflow-hidden flex items-center justify-center">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="w-full h-full overflow-visible"
-          preserveAspectRatio="none"
+          className="w-full h-full max-h-[180px] overflow-visible"
         >
           <defs>
             {/* Soft Terracotta Gradient Area Fill */}

@@ -85,3 +85,15 @@ export async function deleteConversation(id: string): Promise<void> {
   })
   if (!response.ok) throw new Error(`Failed to delete conversation: ${response.status}`)
 }
+
+export async function updateConversationTitle(id: string, title: string): Promise<Conversation> {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CONVERSATION(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title }),
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+  })
+  if (!response.ok) throw new Error(`Failed to update conversation title: ${response.status}`)
+  const data = (await response.json()) as ApiConversation
+  return mapConversation(data)
+}

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import type { MessageBubbleProps } from './MessageBubble.types'
+import { TypingIndicator } from '../TypingIndicator'
+import { MarkdownRenderer } from '../MarkdownRenderer'
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user'
@@ -66,20 +68,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
         {/* Content Box */}
         <div className="flex flex-col gap-1.5 min-w-0">
-          <div className="text-md text-text-primary leading-chat font-sans font-normal select-text whitespace-pre-wrap">
-            {message.status === 'pending' ? (
-              /* Terracotta Typing dots */
-              <div className="flex items-center gap-1.5 px-1 py-3 select-none">
-                <span className="h-2 w-2 rounded-full bg-brand-primary typing-dot" />
-                <span className="h-2 w-2 rounded-full bg-brand-primary typing-dot" />
-                <span className="h-2 w-2 rounded-full bg-brand-primary typing-dot" />
-              </div>
+          <div className="text-md text-text-primary leading-chat font-sans font-normal select-text">
+            {message.status === 'pending' && message.content === '' ? (
+              <TypingIndicator />
             ) : message.status === 'error' ? (
               <span className="text-semantic-error bg-semantic-error/10 border border-semantic-error/25 rounded-lg px-4 py-2 mt-1 inline-block text-sm">
                 An error occurred while generating a response. Please try again.
               </span>
             ) : (
-              message.content
+              <MarkdownRenderer content={message.content} />
             )}
           </div>
 

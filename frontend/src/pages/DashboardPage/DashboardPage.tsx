@@ -62,12 +62,12 @@ export function DashboardPage() {
         </div>
 
         {/* Latency and Error Analytics Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-          <div className="flex flex-col gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+          <div className="flex flex-col gap-5 h-full">
             <ErrorRateCard errorRate={metrics?.errorRate ?? null} isLoading={isLoading} />
 
             {/* AI Insight Card */}
-            <div className="rounded-xl border border-border bg-surface-raised p-5 shadow-sm hover:shadow-md transition-all duration-base flex flex-col gap-3">
+            <div className="flex-1 rounded-xl border border-border bg-surface-raised p-5 shadow-sm hover:shadow-md transition-all duration-base flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-4 h-4 text-brand-primary">

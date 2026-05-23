@@ -13,6 +13,7 @@ export interface LoggerCallOptions {
   sessionId: string
   providerId: string
   request: LLMRequest
+  onChunk?: (chunk: string) => void
 }
 
 export interface LoggerCallResult {
@@ -20,7 +21,7 @@ export interface LoggerCallResult {
 }
 
 export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerCallResult> {
-  const { sessionId, providerId, request } = options
+  const { sessionId, providerId, request, onChunk } = options
 
   const requestId = crypto.randomUUID()
   const timestampRequest = new Date().toISOString()
@@ -32,7 +33,7 @@ export async function loggedLLMCall(options: LoggerCallOptions): Promise<LoggerC
   let response: LLMResponse | undefined
 
   try {
-    response = await adapter.chat(request)
+    response = await adapter.chat(request, onChunk)
   } catch (err) {
     status = err instanceof Error && err.message.includes('timeout') ? 'timeout' : 'error'
     errorCode = err instanceof Error ? err.message : 'UNKNOWN_ERROR'
