@@ -33,6 +33,7 @@ const config: Config = {
           base: 'var(--color-surface-base)',
           raised: 'var(--color-surface-raised)',
           overlay: 'var(--color-surface-overlay)',
+          sidebarActive: 'var(--color-surface-sidebar-active)',
         },
         text: {
           primary: 'var(--color-text-primary)',
@@ -44,9 +45,14 @@ const config: Config = {
           DEFAULT: 'var(--color-border)',
           strong: 'var(--color-border-strong)',
         },
+        user: {
+          bubbleBg: 'var(--color-user-bubble-bg)',
+          bubbleText: 'var(--color-user-bubble-text)',
+        },
       },
       fontFamily: {
         sans: ['var(--font-family-sans)'],
+        serif: ['var(--font-family-serif)'],
         mono: ['var(--font-family-mono)'],
       },
       fontSize: {

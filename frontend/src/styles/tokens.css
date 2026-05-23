@@ -1,53 +1,57 @@
 /* ─── Colors — Brand ─────────────────────────────────────────────────────── */
 :root {
-  --color-brand-primary: #6366f1;
-  --color-brand-secondary: #818cf8;
-  --color-brand-accent: #a5b4fc;
+  --color-brand-primary: #C96F53;   /* Muted Terracotta */
+  --color-brand-secondary: #8FA89B; /* Dusty Sage Green */
+  --color-brand-accent: #C96F53;    /* Muted Terracotta */
 
   /* ─── Colors — Semantic ──────────────────────────────────────────────────── */
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-success: #8FA89B;         /* Sage Green */
+  --color-warning: #D89B54;         /* Warm Amber */
+  --color-error: #BE7D84;           /* Dusty Rose */
+  --color-info: #8FA89B;
 
-  /* ─── Colors — Neutral ───────────────────────────────────────────────────── */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f8fafc;
-  --color-neutral-100: #f1f5f9;
-  --color-neutral-200: #e2e8f0;
-  --color-neutral-300: #cbd5e1;
-  --color-neutral-400: #94a3b8;
-  --color-neutral-500: #64748b;
-  --color-neutral-600: #475569;
-  --color-neutral-700: #334155;
-  --color-neutral-800: #1e293b;
-  --color-neutral-900: #0f172a;
+  /* ─── Colors — Neutral (Warm Parchement/Espresso Scale) ─────────────────── */
+  --color-neutral-0: #FFFFFF;
+  --color-neutral-50: #FAF6F0;      /* Unbleached Linen (Primary Bg) */
+  --color-neutral-100: #F3ECE0;     /* Aged Parchment (Sidebar/Secondary Bg) */
+  --color-neutral-200: #EAE4D9;     /* Soft Border */
+  --color-neutral-300: #D8CEBF;     /* Strong Border */
+  --color-neutral-400: #A89E93;     /* Muted Tan text */
+  --color-neutral-500: #8E8074;
+  --color-neutral-600: #6E6157;     /* Medium warm brown-gray */
+  --color-neutral-700: #544941;
+  --color-neutral-800: #3C332E;
+  --color-neutral-900: #2C231F;     /* Dark Espresso Text */
 
   /* ─── Colors — Surface ───────────────────────────────────────────────────── */
-  --color-surface-base: var(--color-neutral-0);
-  --color-surface-raised: var(--color-neutral-50);
+  --color-surface-base: var(--color-neutral-50);
+  --color-surface-raised: #FCFAF7;  /* Soft Warm White card */
   --color-surface-overlay: var(--color-neutral-100);
+  --color-surface-sidebar-active: #EAE2D3;
+  --color-user-bubble-bg: rgba(201, 111, 83, 0.12);
+  --color-user-bubble-text: var(--color-brand-primary);
 
   /* ─── Colors — Text ──────────────────────────────────────────────────────── */
   --color-text-primary: var(--color-neutral-900);
   --color-text-secondary: var(--color-neutral-600);
   --color-text-muted: var(--color-neutral-400);
-  --color-text-inverse: var(--color-neutral-0);
+  --color-text-inverse: var(--color-neutral-50);
 
   /* ─── Colors — Border ────────────────────────────────────────────────────── */
-  --color-border: var(--color-neutral-200);
-  --color-border-strong: var(--color-neutral-300);
+  --color-border: rgba(110, 97, 87, 0.12);
+  --color-border-strong: rgba(110, 97, 87, 0.25);
 
   /* ─── Typography ─────────────────────────────────────────────────────────── */
-  --font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-family-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-family-serif: 'Fraunces', Georgia, serif;
   --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.875rem;
+  --font-size-2xl: 1.625rem;
+  --font-size-3xl: 2.25rem;
 
   /* ─── Spacing ────────────────────────────────────────────────────────────── */
   --spacing-1: 0.25rem;
@@ -64,20 +68,20 @@
   --spacing-24: 6rem;
 
   /* ─── Border Radius ──────────────────────────────────────────────────────── */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1.25rem;
   --radius-full: 9999px;
 
   /* ─── Shadows ────────────────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 3px 0 rgba(44, 35, 31, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(44, 35, 31, 0.06), 0 2px 6px -1px rgba(44, 35, 31, 0.04);
+  --shadow-lg: 0 16px 28px -4px rgba(44, 35, 31, 0.08), 0 8px 16px -2px rgba(44, 35, 31, 0.04);
 
   /* ─── Transitions ────────────────────────────────────────────────────────── */
-  --transition-fast: 100ms;
-  --transition-base: 150ms;
+  --transition-fast: 150ms;
+  --transition-base: 200ms;
   --transition-slow: 300ms;
 
   /* ─── Z-index scale ──────────────────────────────────────────────────────── */
@@ -86,19 +90,39 @@
   --z-toast: 1200;
 }
 
-/* ─── Dark mode ──────────────────────────────────────────────────────────── */
+/* ─── Dark mode (Cocoa & Dark Espresso) ────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-surface-base: var(--color-neutral-900);
-    --color-surface-raised: var(--color-neutral-800);
-    --color-surface-overlay: var(--color-neutral-700);
+    --color-neutral-0: #171210;
+    --color-neutral-50: #1D1714;      /* Deep Cocoa (Primary Bg) */
+    --color-neutral-100: #171210;     /* Deeper Warm Cocoa (Sidebar/Secondary Bg) */
+    --color-neutral-200: #29201C;     /* Border */
+    --color-neutral-300: #3E302A;
+    --color-neutral-400: #8E8074;     /* Muted */
+    --color-neutral-600: #C6BDB5;     /* Text Secondary */
+    --color-neutral-900: #FAF6F0;     /* Light Cream Text */
 
-    --color-text-primary: var(--color-neutral-50);
-    --color-text-secondary: var(--color-neutral-400);
-    --color-text-muted: var(--color-neutral-500);
-    --color-text-inverse: var(--color-neutral-900);
+    --color-brand-primary: #D27E64;   /* Slightly brighter terracotta for dark contrast */
+    --color-brand-secondary: #A2B5AB; /* Slightly brighter sage green */
+    --color-brand-accent: #D27E64;
 
-    --color-border: var(--color-neutral-700);
-    --color-border-strong: var(--color-neutral-600);
+    --color-surface-base: var(--color-neutral-50);
+    --color-surface-raised: #251E1A;  /* Soft Warm Cocoa Card */
+    --color-surface-overlay: var(--color-neutral-100);
+    --color-surface-sidebar-active: #2E2420;
+    --color-user-bubble-bg: rgba(210, 126, 100, 0.12);
+    --color-user-bubble-text: var(--color-brand-primary);
+
+    --color-text-primary: var(--color-neutral-900);
+    --color-text-secondary: var(--color-neutral-600);
+    --color-text-muted: var(--color-neutral-400);
+    --color-text-inverse: var(--color-neutral-0);
+
+    --color-border: rgba(250, 246, 240, 0.08);
+    --color-border-strong: rgba(250, 246, 240, 0.15);
+
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 16px 28px -4px rgba(0, 0, 0, 0.5), 0 8px 16px -2px rgba(0, 0, 0, 0.3);
   }
 }

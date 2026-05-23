@@ -1,15 +1,21 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui'
+import { useState, useRef, useEffect } from 'react'
 import type { ChatInputProps } from './ChatInput.types'
+import { DEFAULT_MODEL } from '@/constants'
 
 export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [value, setValue] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   function handleSubmit() {
     const trimmed = value.trim()
     if (!trimmed || disabled) return
     onSend(trimmed)
     setValue('')
+    
+    // Reset height of textarea after submit
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -19,24 +25,80 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     }
   }
 
+  // Auto-grow height logic up to 5 lines (~120px)
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    textarea.style.height = 'auto'
+    const newHeight = Math.min(textarea.scrollHeight, 120)
+    textarea.style.height = `${newHeight}px`
+  }, [value])
+
+  // Simple human-readable model name mapping
+  const getFriendlyModelName = () => {
+    if (DEFAULT_MODEL.includes('llama-3.3-70b')) return 'Llama 3.3 70B'
+    return DEFAULT_MODEL
+  }
+
   return (
-    <div className="flex gap-2 items-end border-t border-border px-4 py-3 bg-surface-base">
-      <textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={disabled}
-        rows={1}
-        placeholder="Send a message…"
-        className="flex-1 resize-none rounded border border-border bg-surface-raised px-3 py-2 text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary transition-shadow duration-fast"
-      />
-      <Button
-        onClick={handleSubmit}
-        disabled={disabled || !value.trim()}
-        size="md"
-      >
-        Send
-      </Button>
+    <div className="px-6 pb-6 pt-2 bg-surface-base shrink-0 select-none">
+      {/* Warm Card-Like Container */}
+      <div className="bg-surface-raised border border-border shadow-md rounded-xl p-3.5 flex flex-col gap-2.5 transition-all duration-base focus-within:border-brand-primary/45 focus-within:shadow-lg">
+        <div className="flex gap-3 items-end">
+          {/* Multi-line growable textarea */}
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            rows={1}
+            placeholder="Explore new ideas, search logs, write drafts..."
+            className="flex-1 resize-none bg-transparent py-1 px-1.5 text-[15px] leading-relaxed text-text-primary placeholder:text-text-muted focus:outline-none min-h-[28px] max-h-[120px] custom-scrollbar select-text"
+          />
+
+          {/* Terracotta send button with press shrink scaling */}
+          <button
+            onClick={handleSubmit}
+            disabled={disabled || !value.trim()}
+            className={[
+              'active:scale-[0.96] transition-all duration-fast select-none cursor-pointer',
+              'h-9 w-9 rounded-full flex items-center justify-center',
+              disabled || !value.trim()
+                ? 'bg-neutral-200 text-text-muted opacity-40 cursor-not-allowed'
+                : 'bg-brand-primary hover:bg-brand-primary/95 text-text-inverse shadow-sm hover:shadow',
+            ].join(' ')}
+            title="Send Message"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="2.5"
+              stroke="currentColor"
+              className="w-4 h-4 translate-x-[0.5px]"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Info Row: character count & model name */}
+        <div className="flex justify-between items-center text-[10px] text-text-muted font-sans border-t border-border/40 pt-2 px-1">
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-secondary/80 animate-pulse" />
+            <span className="tracking-wide">Active Model: {getFriendlyModelName()}</span>
+          </div>
+          <div className="tracking-wide select-none">
+            {value.length} {value.length === 1 ? 'character' : 'characters'}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
