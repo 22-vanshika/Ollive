@@ -1,9 +1,9 @@
 import { useRef, useEffect, useState } from 'react'
 import { ConversationList, MessageBubble, ChatInput } from '@/components/chat'
 import { useConversation } from '@/hooks'
-import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION } from '@/constants'
+import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION, APP_VERSION } from '@/constants'
 
-export function ChatPage() {
+export function ChatPage(): React.JSX.Element {
   const {
     conversations,
     activeConversationId,
@@ -38,7 +38,7 @@ export function ChatPage() {
   }, [pinnedIds])
 
   // Toggle pinning action
-  const togglePin = (id: string) => {
+  const togglePin = (id: string): void => {
     setPinnedIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
@@ -50,7 +50,7 @@ export function ChatPage() {
   }, [messages])
 
   // Greeting based on hours
-  const getGreeting = () => {
+  const getGreeting = (): string => {
     const hour = new Date().getHours()
     if (hour < 12) return 'Good morning'
     if (hour < 17) return 'Good afternoon'
@@ -71,12 +71,12 @@ export function ChatPage() {
     (c) => !pinnedIds.includes(c.id)
   )
 
-  const handleSuggestionClick = (text: string) => {
+  const handleSuggestionClick = (text: string): void => {
     sendMessage(text)
   }
 
   // Export conversation as beautiful Markdown
-  const handleExportMarkdown = () => {
+  const handleExportMarkdown = (): void => {
     if (!messages.length) return
     const title = conversations.find((c) => c.id === activeConversationId)?.title ?? UNTITLED_CONVERSATION
     const mdHeader = `# Ollive Chat Export — ${title}\nExported on: ${new Date().toLocaleString()}\n\n---\n\n`
@@ -218,7 +218,7 @@ export function ChatPage() {
             </svg>
             Help & Shortcuts
           </a>
-          <span className="opacity-60">v1.1</span>
+          <span className="opacity-60">{APP_VERSION}</span>
         </div>
       </aside>
 

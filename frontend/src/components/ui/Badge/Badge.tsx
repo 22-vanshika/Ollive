@@ -8,13 +8,10 @@ const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
   neutral: 'bg-surface-overlay text-text-secondary',
 }
 
-export function Badge({ variant = 'neutral', children }: BadgeProps) {
+export function Badge({ variant = 'neutral', children }: BadgeProps): React.JSX.Element {
   return (
     <span
-      className={[
-        'inline-flex items-center rounded-full px-2 py-0 text-xs font-medium',
-        variantClasses[variant],
-      ].join(' ')}
+      className={`inline-flex items-center rounded-full px-2 py-0 text-xs font-medium ${variantClasses[variant]}`}
     >
       {children}
     </span>

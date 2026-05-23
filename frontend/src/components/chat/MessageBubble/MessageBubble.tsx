@@ -3,13 +3,13 @@ import type { MessageBubbleProps } from './MessageBubble.types'
 import { TypingIndicator } from '../TypingIndicator'
 import { MarkdownRenderer } from '../MarkdownRenderer'
 
-export function MessageBubble({ message }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Element {
   const isUser = message.role === 'user'
   const [copied, setCopied] = useState(false)
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null)
 
   // Copy helper
-  const handleCopy = async () => {
+  const handleCopy = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(message.content)
       setCopied(true)
@@ -20,7 +20,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   }
 
   // Realistic stable statistics based on the message content & id hash
-  const generateSimulatedStats = () => {
+  const generateSimulatedStats = (): { latency: string; tokens: string } => {
     // Generate simple stable hash from id
     let hash = 0
     for (let i = 0; i < message.id.length; i++) {
@@ -122,10 +122,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                 {/* Thumbs Up */}
                 <button
                   onClick={() => setFeedback(feedback === 'up' ? null : 'up')}
-                  className={[
-                    'p-1 rounded hover:bg-neutral-200/50 text-text-muted transition-colors cursor-pointer',
-                    feedback === 'up' ? 'text-brand-secondary' : 'hover:text-brand-secondary',
-                  ].join(' ')}
+                  className={`p-1 rounded hover:bg-neutral-200/50 text-text-muted transition-colors cursor-pointer ${
+                    feedback === 'up' ? 'text-brand-secondary' : 'hover:text-brand-secondary'
+                  }`}
                   title="Thumbs up"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'up' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
@@ -136,10 +135,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                 {/* Thumbs Down */}
                 <button
                   onClick={() => setFeedback(feedback === 'down' ? null : 'down')}
-                  className={[
-                    'p-1 rounded hover:bg-neutral-200/50 text-text-muted transition-colors cursor-pointer',
-                    feedback === 'down' ? 'text-brand-primary' : 'hover:text-brand-primary',
-                  ].join(' ')}
+                  className={`p-1 rounded hover:bg-neutral-200/50 text-text-muted transition-colors cursor-pointer ${
+                    feedback === 'down' ? 'text-brand-primary' : 'hover:text-brand-primary'
+                  }`}
                   title="Thumbs down"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'down' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">

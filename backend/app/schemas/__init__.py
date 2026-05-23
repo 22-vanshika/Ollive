@@ -8,6 +8,7 @@ from app.schemas.conversation import (
 )
 from app.schemas.ingest import IngestRequest, IngestResponse
 from app.schemas.metrics import MetricsSummaryResponse
+from app.schemas.health import HealthResponse
 
 __all__ = [
     "ChatRequest",
@@ -20,4 +21,5 @@ __all__ = [
     "MessageCreate",
     "MetricsSummaryResponse",
     "MessageResponse",
+    "HealthResponse",
 ]

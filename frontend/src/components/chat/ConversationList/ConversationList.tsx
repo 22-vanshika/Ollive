@@ -10,7 +10,7 @@ export function ConversationList({
   onSelect,
   onDelete,
   onTogglePin,
-}: ConversationListProps) {
+}: ConversationListProps): React.JSX.Element {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-2 p-4">
@@ -48,19 +48,17 @@ export function ConversationList({
             {/* The Conversation Row Button */}
             <button
               onClick={() => onSelect(conv.id)}
-              className={[
-                'w-full text-left px-4 py-3 flex flex-col justify-center transition-all duration-base cursor-pointer',
+              className={`w-full text-left px-4 py-3 flex flex-col justify-center transition-all duration-base cursor-pointer border-l-accent ${
                 isActive
-                  ? 'bg-surface-sidebarActive border-l-accent border-brand-primary pl-3.5'
-                  : 'hover:bg-neutral-200/30 border-l-accent border-transparent',
-              ].join(' ')}
+                  ? 'bg-surface-sidebarActive border-brand-primary pl-3.5'
+                  : 'hover:bg-neutral-200/30 border-transparent'
+              }`}
             >
               <div className="flex items-center justify-between w-full gap-2">
                 <span
-                  className={[
-                    'text-sm truncate pr-16',
-                    isActive ? 'font-semibold text-text-primary' : 'font-medium text-text-secondary',
-                  ].join(' ')}
+                  className={`text-sm truncate pr-16 ${
+                    isActive ? 'font-semibold text-text-primary' : 'font-medium text-text-secondary'
+                  }`}
                 >
                   {conv.title ?? UNTITLED_CONVERSATION}
                 </span>

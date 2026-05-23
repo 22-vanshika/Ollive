@@ -1,8 +1,9 @@
 import { LatencyChart, ErrorRateCard, StatCard } from '@/components/dashboard'
 import { useInferenceMetrics } from '@/hooks'
 import { formatLatency, formatTokenCount } from '@/utils'
+import { ERROR_RATE_WARNING_THRESHOLD } from '@/constants'
 
-export function DashboardPage() {
+export function DashboardPage(): React.JSX.Element {
   const { metrics, latencySeries, recentLogs, isLoading, error } = useInferenceMetrics()
 
   if (error) {
@@ -33,7 +34,7 @@ export function DashboardPage() {
         </div>
 
         {/* Global Critical System Status Banner (if overall error rate is higher than 10%) */}
-        {metrics && metrics.errorRate >= 0.10 && (
+        {metrics && metrics.errorRate >= ERROR_RATE_WARNING_THRESHOLD && (
           <div className="w-full flex items-center gap-3 px-5 py-4 rounded-xl bg-semantic-error/10 border border-semantic-error/25 text-semantic-error">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.2" stroke="currentColor" className="w-5 h-5 shrink-0">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376C1.83 19.126 2.914 21 4.645 21h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />

@@ -1,6 +1,6 @@
 import type { StatCardProps } from './StatCard.types'
 
-export function StatCard({ label, value }: StatCardProps) {
+export function StatCard({ label, value }: StatCardProps): React.JSX.Element {
   return (
     <div className="rounded-xl bg-surface-raised border border-border shadow-sm p-5 flex flex-col hover:shadow-md transition-all duration-base select-none">
       {/* Muted label above */}

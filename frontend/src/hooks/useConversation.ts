@@ -10,9 +10,9 @@ import {
 } from '@/services'
 import { loggedLLMCall } from '@/sdk'
 import { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_PROVIDER, UNTITLED_CONVERSATION } from '@/constants'
-import type { Message } from '@/types'
+import type { Message, UseConversationResult } from '@/types'
 
-export function useConversation() {
+export function useConversation(): UseConversationResult {
   const {
     conversations,
     activeConversationId,
@@ -112,6 +112,9 @@ export function useConversation() {
       appendMessage(pendingAssistantMsg)
       setSending(true)
 
+      // Persist user turn immediately so it gets an earlier timestamp
+      addMessage(conversationId, 'user', content).catch(console.error)
+
       try {
         const { response } = await loggedLLMCall({
           sessionId: conversationId,
@@ -137,8 +140,7 @@ export function useConversation() {
         })
         updateMessage(assistantMsgId, { content: response.content, status: 'complete' })
 
-        // Persist both turns non-blocking — must not delay the UI response
-        addMessage(conversationId, 'user', content).catch(console.error)
+        // Persist assistant reply once complete
         addMessage(conversationId, 'assistant', response.content).catch(console.error)
 
         // Non-blocking auto-generation of conversation title

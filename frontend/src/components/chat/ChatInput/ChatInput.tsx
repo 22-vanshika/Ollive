@@ -4,11 +4,11 @@ import { DEFAULT_MODEL } from '@/constants'
 
 const INPUT_MAX_HEIGHT_PX = 120
 
-export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
+export function ChatInput({ onSend, disabled = false }: ChatInputProps): React.JSX.Element {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  function handleSubmit() {
+  function handleSubmit(): void {
     const trimmed = value.trim()
     if (!trimmed || disabled) return
     onSend(trimmed)
@@ -20,7 +20,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSubmit()
@@ -38,7 +38,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   }, [value])
 
   // Simple human-readable model name mapping
-  const getFriendlyModelName = () => {
+  const getFriendlyModelName = (): string => {
     if (DEFAULT_MODEL.includes('llama-3.3-70b')) return 'Llama 3.3 70B'
     return DEFAULT_MODEL
   }
@@ -64,13 +64,11 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           <button
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
-            className={[
-              'active:scale-[0.96] transition-all duration-fast select-none cursor-pointer',
-              'h-9 w-9 rounded-full flex items-center justify-center',
+            className={`active:scale-[0.96] transition-all duration-fast select-none cursor-pointer h-9 w-9 rounded-full flex items-center justify-center ${
               disabled || !value.trim()
                 ? 'bg-neutral-200 text-text-muted opacity-40 cursor-not-allowed'
-                : 'bg-brand-primary hover:bg-brand-primary/95 text-text-inverse shadow-sm hover:shadow',
-            ].join(' ')}
+                : 'bg-brand-primary hover:bg-brand-primary/95 text-text-inverse shadow-sm hover:shadow'
+            }`}
             title="Send Message"
           >
             <svg

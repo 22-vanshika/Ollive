@@ -79,9 +79,12 @@ const config: Config = {
       },
       minHeight: {
         input: 'var(--input-min-height)',
+        chart: 'var(--chart-min-height)',
+        'chart-canvas': 'var(--chart-canvas-min-height)',
       },
       maxHeight: {
         input: 'var(--input-max-height)',
+        'chart-canvas': 'var(--chart-canvas-min-height)',
       },
       borderWidth: {
         accent: 'var(--border-width-accent)',

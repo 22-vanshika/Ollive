@@ -11,4 +11,3 @@ export const API_ENDPOINTS = {
 } as const
 
 export const API_TIMEOUT_MS = 30_000
-export const LOG_SHIP_TIMEOUT_MS = 5_000

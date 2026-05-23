@@ -2,6 +2,10 @@ import type { WelcomeSuggestion } from '@/types'
 
 export const UNTITLED_CONVERSATION = 'Untitled exploration'
 
+export const APP_VERSION = 'v1.1'
+export const ERROR_RATE_WARNING_THRESHOLD = 0.10
+export const ERROR_RATE_ELEVATED_THRESHOLD = 0.02
+
 export const WELCOME_SUGGESTIONS: WelcomeSuggestion[] = [
   {
     id: 's1',

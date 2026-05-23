@@ -1,8 +1,9 @@
 import { Badge } from '@/components/ui'
 import { formatErrorRate } from '@/utils'
 import type { ErrorRateCardProps } from './ErrorRateCard.types'
+import { ERROR_RATE_WARNING_THRESHOLD, ERROR_RATE_ELEVATED_THRESHOLD } from '@/constants'
 
-export function ErrorRateCard({ errorRate, isLoading }: ErrorRateCardProps) {
+export function ErrorRateCard({ errorRate, isLoading }: ErrorRateCardProps): React.JSX.Element {
   if (isLoading) {
     return (
       <div className="h-28 rounded-xl bg-neutral-200/50 animate-pulse border border-neutral-200/20" />
@@ -10,8 +11,8 @@ export function ErrorRateCard({ errorRate, isLoading }: ErrorRateCardProps) {
   }
 
   // Handle standard ranges
-  const isHigh = errorRate !== null && errorRate >= 0.10
-  const isElevated = errorRate !== null && errorRate >= 0.02 && errorRate < 0.10
+  const isHigh = errorRate !== null && errorRate >= ERROR_RATE_WARNING_THRESHOLD
+  const isElevated = errorRate !== null && errorRate >= ERROR_RATE_ELEVATED_THRESHOLD && errorRate < ERROR_RATE_WARNING_THRESHOLD
 
   const badgeVariant = errorRate === null
     ? 'neutral'

@@ -1,8 +1,5 @@
 import React from 'react'
-
-interface MarkdownRendererProps {
-  content: string
-}
+import type { MarkdownRendererProps } from './MarkdownRenderer.types'
 
 function parseInlineStyles(text: string): React.ReactNode[] | string {
   // A regex to match **bold**
@@ -39,7 +36,7 @@ function parseInlineStyles(text: string): React.ReactNode[] | string {
   return parts.length > 0 ? parts : text
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content }: MarkdownRendererProps): React.ReactElement | null {
   if (!content) return null
 
   // Split by newlines

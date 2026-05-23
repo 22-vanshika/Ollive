@@ -77,6 +77,8 @@
   --input-max-height: 7.5rem;    /* 120px — textarea maximum height               */
   --bubble-max-width-user: 70%;  /* user bubble max width (right-aligned)         */
   --bubble-max-width-assistant: 85%; /* assistant bubble max width (left-aligned) */
+  --chart-min-height: 17.5rem;   /* 280px — chart min height                      */
+  --chart-canvas-min-height: 11.25rem; /* 180px — chart canvas min/max height     */
 
   /* ─── Border Widths ──────────────────────────────────────────────────────── */
   --border-width-accent: 3px;    /* active conversation left border indicator     */

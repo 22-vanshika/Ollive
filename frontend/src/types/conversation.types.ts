@@ -60,3 +60,16 @@ export interface ConversationState {
   setLoadingMessages: (loading: boolean) => void
   setSending: (sending: boolean) => void
 }
+
+export interface UseConversationResult {
+  conversations: Conversation[]
+  activeConversationId: string | null
+  messages: Message[]
+  isLoadingConversations: boolean
+  isLoadingMessages: boolean
+  isSending: boolean
+  createNewConversation: () => Promise<void>
+  selectConversation: (id: string) => Promise<void>
+  deleteConversation: (id: string) => Promise<void>
+  sendMessage: (content: string) => Promise<void>
+}
