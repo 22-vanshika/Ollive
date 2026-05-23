@@ -80,18 +80,37 @@ export function DashboardPage(): React.JSX.Element {
               </div>
 
               <div className="flex flex-col gap-2.5 text-xs font-sans text-text-secondary leading-relaxed">
-                <div className="flex gap-2.5 items-start">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-warning shrink-0" />
-                  <p>Latency spike correlates with a burst of concurrent requests — consider request queuing under <span className="font-medium text-text-primary">sustained load</span>.</p>
-                </div>
-                <div className="flex gap-2.5 items-start">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-error shrink-0" />
-                  <p>Error rate trending near the <span className="font-medium text-text-primary">10% alert threshold</span> — Groq API fallback response times may be a contributing factor.</p>
-                </div>
-                <div className="flex gap-2.5 items-start">
-                  <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-brand-secondary shrink-0" />
-                  <p>Token density within normal range; completion size suggests <span className="font-medium text-text-primary">well-scoped prompts</span> with no runaway generation.</p>
-                </div>
+                {!metrics || metrics.totalRequests === 0 ? (
+                  <>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-text-muted shrink-0" />
+                      <p>System is currently <span className="font-medium text-text-primary">idle</span>. No active query streams detected.</p>
+                    </div>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-text-muted shrink-0" />
+                      <p>Operational latency diagnostics will compute automatically on first request.</p>
+                    </div>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-text-muted shrink-0" />
+                      <p>Start a new conversation to generate performance analysis and system insights.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-warning shrink-0" />
+                      <p>Latency spike correlates with a burst of concurrent requests — consider request queuing under <span className="font-medium text-text-primary">sustained load</span>.</p>
+                    </div>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-semantic-error shrink-0" />
+                      <p>Error rate trending near the <span className="font-medium text-text-primary">10% alert threshold</span> — Groq API fallback response times may be a contributing factor.</p>
+                    </div>
+                    <div className="flex gap-2.5 items-start">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-brand-secondary shrink-0" />
+                      <p>Token density within normal range; completion size suggests <span className="font-medium text-text-primary">well-scoped prompts</span> with no runaway generation.</p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
