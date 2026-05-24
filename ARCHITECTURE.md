@@ -1,10 +1,5 @@
 # Ollive — Architecture Notes
 
-> Paste this document into a Notion page, then add the Notion link to the README.
-> Delete this instruction line before publishing.
-
----
-
 ## Ingestion Flow
 
 Every LLM call in Ollive goes through a five-step pipeline before a log entry reaches the database.
@@ -64,17 +59,17 @@ HTTP request arrives
 
 **What is logged — and what isn't.**
 
-Ollive logs *metadata about inference calls*, not full conversation payloads. Storing complete prompts and responses at scale is expensive (storage, cost, compliance risk). Instead:
+Ollive logs _metadata about inference calls_, not full conversation payloads. Storing complete prompts and responses at scale is expensive (storage, cost, compliance risk). Instead:
 
-| Field | What's stored | Why |
-|---|---|---|
-| `input_preview` | First 200 chars of user message, PII-redacted | Enough to understand what triggered the call |
-| `output_preview` | First 200 chars of assistant response, PII-redacted | Enough to audit quality |
-| `latency_ms` | End-to-end time including network, not just TTFT | Captures the full user-perceived delay |
-| `prompt_tokens` / `completion_tokens` | From the provider's usage object in the stream | Accurate cost attribution |
-| `status` | `success` / `error` / `timeout` | Error rate calculation |
-| `error_code` | Provider error message on failure | Root-cause diagnostics |
-| `model` | Exact model string from the provider | Detects if Groq serves a different variant |
+| Field                                 | What's stored                                       | Why                                          |
+| ------------------------------------- | --------------------------------------------------- | -------------------------------------------- |
+| `input_preview`                       | First 200 chars of user message, PII-redacted       | Enough to understand what triggered the call |
+| `output_preview`                      | First 200 chars of assistant response, PII-redacted | Enough to audit quality                      |
+| `latency_ms`                          | End-to-end time including network, not just TTFT    | Captures the full user-perceived delay       |
+| `prompt_tokens` / `completion_tokens` | From the provider's usage object in the stream      | Accurate cost attribution                    |
+| `status`                              | `success` / `error` / `timeout`                     | Error rate calculation                       |
+| `error_code`                          | Provider error message on failure                   | Root-cause diagnostics                       |
+| `model`                               | Exact model string from the provider                | Detects if Groq serves a different variant   |
 
 **Full messages** are stored separately in the `messages` table (for conversation resume), but that table is user-facing data, not observability data — it has no metrics aggregation.
 
@@ -95,6 +90,7 @@ The SDK classifies a failure as `timeout` if `err.message.includes("timeout")` (
 **Bottleneck:** At high sustained write volume, the database connection pool becomes the constraint (Supabase PgBouncer helps significantly). A write-heavy burst can cause ingestion latency to spike.
 
 **Upgrade path:**
+
 ```
 SDK → sendBeacon → Redis Streams (producer)
                         │
@@ -104,11 +100,13 @@ SDK → sendBeacon → Redis Streams (producer)
                         │
                    inference_logs
 ```
+
 Batch inserts are 10–50× more efficient than single-row inserts at scale. The consumer worker decouples ingestion latency from database capacity.
 
 ### Read path (dashboard)
 
 The three indexes on `inference_logs` cover all current dashboard queries:
+
 - Summary stats (`AVG`, `SUM`, `COUNT`) over the full table — no index helps here; acceptable at <100k rows, needs TimescaleDB or ClickHouse beyond that
 - Latency time series — filtered by `created_at` range; a `(created_at DESC)` index would help at >1M rows
 - Recent logs feed — `ORDER BY created_at DESC LIMIT 50` — fast with the existing setup
@@ -143,6 +141,7 @@ Repository functions use `async with session` via FastAPI's `Depends(get_db)`. I
 ### Network failures (SDK → ingestion)
 
 `sendBeacon` is best-effort. If the beacon fails (browser offline, OS queue full):
+
 - The `fetch` fallback fires
 - If the fetch also fails, the error is silently caught (`catch(() => {})`)
 - The log entry is lost for that call
@@ -156,6 +155,7 @@ The SDK can deliver the same log twice (page refresh mid-send, service worker re
 ### Conversation deletion during an active session
 
 If a user deletes a conversation while messages are being streamed:
+
 - Frontend: the active conversation ID is cleared; new messages have no target and are discarded
 - Backend: the `messages` cascade delete removes all rows; `inference_logs.conversation_id` is set to `NULL` (not deleted) — the telemetry is preserved
 
@@ -174,6 +174,7 @@ The current HTTP ingestion path is synchronous: the SDK fires a request, the bac
 The application runs on Railway (backend) and Vercel (frontend) — both are PaaS platforms that handle infrastructure. Kubernetes manifests would enable self-hosted deployment with fine-grained resource control and horizontal pod autoscaling, but they also require maintaining a cluster, writing manifests for every service, and operating a container registry pipeline.
 
 **What it would take:**
+
 - `Deployment` + `Service` for backend and frontend
 - `Ingress` with TLS termination
 - `HorizontalPodAutoscaler` on the backend

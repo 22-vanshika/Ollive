@@ -2,8 +2,8 @@
 
 > A production-grade chatbot with an embedded inference logging SDK, real-time ingestion pipeline, and operational telemetry dashboard.
 
-**Live demo →** `[your Vercel URL here]`
-**Architecture notes (Notion) →** `[your Notion link here]`
+**Live demo →** `https://ollive-murex.vercel.app/`
+**Architecture notes (Notion) →** `https://www.notion.so/ARCHITECTURE-36aa0469ae7880998abdccf1c3a9b2e5?source=copy_link`
 
 ---
 
@@ -27,12 +27,12 @@ Most LLM applications are black boxes — you send a prompt, you get a response,
 
 **What's built:**
 
-| Component | Description |
-|---|---|
-| **Chatbot UI** | Multi-turn conversations with real-time streaming token output, conversation history (pin, resume, delete), and full markdown + syntax highlighting |
-| **SDK / Middleware** | TypeScript logger that measures end-to-end latency, captures token usage, redacts PII, and ships logs via `navigator.sendBeacon` — non-blocking and survives page unload |
-| **Ingestion API** | FastAPI endpoint that validates, deduplicates (by `request_id`), PII-scrubs (defensive second pass), and persists every log entry |
-| **Telemetry Dashboard** | Live stats: total requests, average latency, total tokens, error rate with configurable thresholds, latency time-series chart, and a recent inference feed table |
+| Component               | Description                                                                                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Chatbot UI**          | Multi-turn conversations with real-time streaming token output, conversation history (pin, resume, delete), and full markdown + syntax highlighting                      |
+| **SDK / Middleware**    | TypeScript logger that measures end-to-end latency, captures token usage, redacts PII, and ships logs via `navigator.sendBeacon` — non-blocking and survives page unload |
+| **Ingestion API**       | FastAPI endpoint that validates, deduplicates (by `request_id`), PII-scrubs (defensive second pass), and persists every log entry                                        |
+| **Telemetry Dashboard** | Live stats: total requests, average latency, total tokens, error rate with configurable thresholds, latency time-series chart, and a recent inference feed table         |
 
 ---
 
@@ -89,21 +89,21 @@ Most LLM applications are black boxes — you send a prompt, you get a response,
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, Vite 8, TypeScript 6 |
-| Styling | Tailwind CSS 3 with a full CSS custom-property design token system |
-| State | Zustand 5 |
-| Markdown | react-markdown 10 + react-syntax-highlighter 16 (Prism / solarizedlight) |
-| Backend | FastAPI + Uvicorn |
-| ORM | SQLAlchemy 2 (fully async) + asyncpg |
-| Migrations | Alembic |
-| Validation | Pydantic v2 + pydantic-settings |
-| LLM | Groq API — Llama 3.3 70B Versatile |
-| Database | PostgreSQL via Supabase |
-| Frontend deploy | Vercel |
-| Backend deploy | Railway |
-| Containers | Docker + Docker Compose |
+| Layer           | Technology                                                               |
+| --------------- | ------------------------------------------------------------------------ |
+| Frontend        | React 19, Vite 8, TypeScript 6                                           |
+| Styling         | Tailwind CSS 3 with a full CSS custom-property design token system       |
+| State           | Zustand 5                                                                |
+| Markdown        | react-markdown 10 + react-syntax-highlighter 16 (Prism / solarizedlight) |
+| Backend         | FastAPI + Uvicorn                                                        |
+| ORM             | SQLAlchemy 2 (fully async) + asyncpg                                     |
+| Migrations      | Alembic                                                                  |
+| Validation      | Pydantic v2 + pydantic-settings                                          |
+| LLM             | Groq API — Llama 3.3 70B Versatile                                       |
+| Database        | PostgreSQL via Supabase                                                  |
+| Frontend deploy | Vercel                                                                   |
+| Backend deploy  | Railway                                                                  |
+| Containers      | Docker + Docker Compose                                                  |
 
 ---
 
@@ -128,10 +128,10 @@ echo "GROQ_API_KEY=gsk_..." > .env
 docker compose up --build
 ```
 
-| Service | URL |
-|---|---|
-| Chat UI | http://localhost:5173 |
-| Backend API | http://localhost:8000 |
+| Service            | URL                        |
+| ------------------ | -------------------------- |
+| Chat UI            | http://localhost:5173      |
+| Backend API        | http://localhost:8000      |
 | API docs (Swagger) | http://localhost:8000/docs |
 
 The compose stack automatically runs `alembic upgrade head` before starting the backend, so no manual migration step is needed.
@@ -164,13 +164,13 @@ npm run dev                      # http://localhost:5173
 
 ### Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `DATABASE_URL` | ✅ | `postgresql+asyncpg://user:pass@host:5432/dbname` |
-| `GROQ_API_KEY` | ✅ | From [console.groq.com/keys](https://console.groq.com/keys) |
-| `APP_ENV` | — | `development` / `staging` / `production` (default: `development`) |
-| `CORS_ORIGINS` | — | JSON array: `["http://localhost:5173"]` |
-| `LOG_LEVEL` | — | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
+| Variable       | Required | Description                                                       |
+| -------------- | -------- | ----------------------------------------------------------------- |
+| `DATABASE_URL` | ✅       | `postgresql+asyncpg://user:pass@host:5432/dbname`                 |
+| `GROQ_API_KEY` | ✅       | From [console.groq.com/keys](https://console.groq.com/keys)       |
+| `APP_ENV`      | —        | `development` / `staging` / `production` (default: `development`) |
+| `CORS_ORIGINS` | —        | JSON array: `["http://localhost:5173"]`                           |
+| `LOG_LEVEL`    | —        | `DEBUG` / `INFO` / `WARNING` (default: `INFO`)                    |
 
 ---
 
@@ -230,11 +230,11 @@ created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 
 **Indexes (with justification):**
 
-| Index | Serves | Beneficial from |
-|---|---|---|
-| `ix_inference_logs_conversation_id` | Dashboard timeline, per-conversation metrics | Row 1 — every conversation detail view hits it |
-| `ix_inference_logs_session_id` | SDK-level session replay | ~1 000+ rows when sessions fan out |
-| `ix_inference_logs_request_id` (unique) | Idempotency check on every ingest | Row 1 — every ingest hits it |
+| Index                                   | Serves                                       | Beneficial from                                |
+| --------------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| `ix_inference_logs_conversation_id`     | Dashboard timeline, per-conversation metrics | Row 1 — every conversation detail view hits it |
+| `ix_inference_logs_session_id`          | SDK-level session replay                     | ~1 000+ rows when sessions fan out             |
+| `ix_inference_logs_request_id` (unique) | Idempotency check on every ingest            | Row 1 — every ingest hits it                   |
 
 `conversation_id` is `ON DELETE SET NULL` — inference logs are observability data and should outlive the conversation they came from. Deleting a chat does not purge its telemetry.
 
@@ -281,23 +281,23 @@ The latency and token counts shown beneath each assistant bubble are derived cli
 
 ### ✅ Completed — 8 / 10
 
-| Bonus | How it's implemented |
-|---|---|
-| **Multi-provider support** | `provider-adapter.ts` exposes a `ProviderAdapter` interface. `createProviderAdapter(id)` is a factory. Adding OpenAI or Anthropic = one new object implementing the interface + one new `case`. Zero changes to existing code. |
-| **Streaming responses** | Backend returns `StreamingResponse(media_type="application/x-ndjson")`. Frontend reads `response.body` as a `ReadableStream`, parses each newline-delimited JSON chunk, and calls `onChunk(token)` to update the UI incrementally. |
-| **Latency + Throughput + Errors dashboards** | Three StatCards (total requests, avg latency, total tokens), a latency time-series chart, an error rate card with 5% elevated / 10% critical thresholds, an AI analysis card, and a live recent inference table. |
-| **PII redaction** | SDK redacts before shipping (email, phone, SSN, card numbers, API keys, Bearer tokens). Ingestion service runs the same rules again as a hard boundary before writing to the DB. |
-| **Docker Compose one-command setup** | `docker compose up --build` starts PostgreSQL + backend (with auto-migration) + frontend served via nginx with an API proxy. |
-| **List conversations** | Sidebar with full conversation list, relative timestamps, pin indicators, delete action. |
-| **Resume a conversation** | Clicking any sidebar item loads the full message history from the database via `GET /api/v1/conversations/{id}`. |
-| **Delete / cancel a conversation** | Trash icon in the sidebar calls `DELETE /api/v1/conversations/{id}`. Cascade deletes messages. Inference logs are preserved (`ON DELETE SET NULL`). |
+| Bonus                                        | How it's implemented                                                                                                                                                                                                               |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Multi-provider support**                   | `provider-adapter.ts` exposes a `ProviderAdapter` interface. `createProviderAdapter(id)` is a factory. Adding OpenAI or Anthropic = one new object implementing the interface + one new `case`. Zero changes to existing code.     |
+| **Streaming responses**                      | Backend returns `StreamingResponse(media_type="application/x-ndjson")`. Frontend reads `response.body` as a `ReadableStream`, parses each newline-delimited JSON chunk, and calls `onChunk(token)` to update the UI incrementally. |
+| **Latency + Throughput + Errors dashboards** | Three StatCards (total requests, avg latency, total tokens), a latency time-series chart, an error rate card with 5% elevated / 10% critical thresholds, an AI analysis card, and a live recent inference table.                   |
+| **PII redaction**                            | SDK redacts before shipping (email, phone, SSN, card numbers, API keys, Bearer tokens). Ingestion service runs the same rules again as a hard boundary before writing to the DB.                                                   |
+| **Docker Compose one-command setup**         | `docker compose up --build` starts PostgreSQL + backend (with auto-migration) + frontend served via nginx with an API proxy.                                                                                                       |
+| **List conversations**                       | Sidebar with full conversation list, relative timestamps, pin indicators, delete action.                                                                                                                                           |
+| **Resume a conversation**                    | Clicking any sidebar item loads the full message history from the database via `GET /api/v1/conversations/{id}`.                                                                                                                   |
+| **Delete / cancel a conversation**           | Trash icon in the sidebar calls `DELETE /api/v1/conversations/{id}`. Cascade deletes messages. Inference logs are preserved (`ON DELETE SET NULL`).                                                                                |
 
 ### ❌ Not completed — 2 / 10
 
-| Bonus | Effort estimate | Notes |
-|---|---|---|
-| **Event-based architecture** | 1–2 days | Would need a broker (Redis Streams / SQS / Kafka), a producer in the SDK/ingest route, and a consumer worker. The HTTP path works at this scale but is not decoupled. |
-| **Self-hosted Kubernetes** | 1 day of manifests + cluster setup | App currently deploys to Railway + Vercel (PaaS). k8s manifests would need `Deployment`, `Service`, `Ingress`, `HPA`, `ConfigMap`, `Secret`, and a container registry pipeline. |
+| Bonus                        | Effort estimate                    | Notes                                                                                                                                                                           |
+| ---------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Event-based architecture** | 1–2 days                           | Would need a broker (Redis Streams / SQS / Kafka), a producer in the SDK/ingest route, and a consumer worker. The HTTP path works at this scale but is not decoupled.           |
+| **Self-hosted Kubernetes**   | 1 day of manifests + cluster setup | App currently deploys to Railway + Vercel (PaaS). k8s manifests would need `Deployment`, `Service`, `Ingress`, `HPA`, `ConfigMap`, `Secret`, and a container registry pipeline. |
 
 ---
 
