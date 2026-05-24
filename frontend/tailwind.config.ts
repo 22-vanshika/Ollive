@@ -72,6 +72,8 @@ const config: Config = {
       },
       width: {
         sidebar: 'var(--sidebar-width)',
+        sidebarTablet: 'var(--sidebar-width-tablet)',
+        sidebarMobile: 'var(--sidebar-width-mobile)',
       },
       maxWidth: {
         'bubble-user': 'var(--bubble-max-width-user)',
@@ -102,6 +104,7 @@ const config: Config = {
         16: 'var(--spacing-16)',
         20: 'var(--spacing-20)',
         24: 'var(--spacing-24)',
+        touch: 'var(--touch-target-min)',
       },
       borderRadius: {
         sm: 'var(--radius-sm)',

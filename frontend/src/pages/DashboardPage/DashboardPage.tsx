@@ -22,7 +22,7 @@ export function DashboardPage(): React.JSX.Element {
 
   return (
     <div className="h-full w-full bg-surface-base overflow-y-auto custom-scrollbar select-none">
-      <div className="max-w-5xl mx-auto px-8 py-10 flex flex-col gap-8 animate-slide-in">
+      <div className="max-w-5xl mx-auto px-4 py-6 sm:px-8 sm:py-10 flex flex-col gap-8 animate-slide-in">
         {/* Editorial Dashboard Header */}
         <div className="flex flex-col gap-1.5 border-b border-border pb-5">
           <h1 className="font-serif text-3xl font-extrabold tracking-wide text-text-primary">
@@ -47,7 +47,7 @@ export function DashboardPage(): React.JSX.Element {
         )}
 
         {/* Stat Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <StatCard
             label="Total Logged Queries"
             value={isLoading ? '—' : String(metrics?.totalRequests ?? 0)}

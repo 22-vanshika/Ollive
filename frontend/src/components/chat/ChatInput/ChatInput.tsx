@@ -44,9 +44,9 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): React.J
   }
 
   return (
-    <div className="px-6 pb-6 pt-2 bg-surface-base shrink-0 select-none">
+    <div className="px-4 pb-4 pt-1.5 sm:px-6 sm:pb-6 sm:pt-2 bg-surface-base shrink-0 select-none">
       {/* Warm Card-Like Container */}
-      <div className="bg-surface-raised border border-border shadow-md rounded-xl p-3.5 flex flex-col gap-2.5 transition-all duration-base focus-within:border-brand-primary/45 focus-within:shadow-lg">
+      <div className="bg-surface-raised border border-border shadow-md rounded-xl p-2.5 sm:p-3.5 flex flex-col gap-2.5 transition-all duration-base focus-within:border-brand-primary/45 focus-within:shadow-lg">
         <div className="flex gap-3 items-end">
           {/* Multi-line growable textarea */}
           <textarea
@@ -64,7 +64,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): React.J
           <button
             onClick={handleSubmit}
             disabled={disabled || !value.trim()}
-            className={`active:scale-[0.96] transition-all duration-fast select-none cursor-pointer h-9 w-9 rounded-full flex items-center justify-center ${
+            className={`active:scale-[0.96] transition-all duration-fast select-none cursor-pointer w-touch h-touch sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 ${
               disabled || !value.trim()
                 ? 'bg-neutral-200 text-text-muted opacity-40 cursor-not-allowed'
                 : 'bg-brand-primary hover:bg-brand-primary/95 text-text-inverse shadow-sm hover:shadow'
@@ -77,7 +77,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): React.J
               viewBox="0 0 24 24"
               strokeWidth="2.5"
               stroke="currentColor"
-              className="w-4 h-4"
+              className="w-4.5 h-4.5 sm:w-4 sm:h-4"
             >
               <path
                 strokeLinecap="round"

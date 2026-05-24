@@ -48,7 +48,7 @@ export function ConversationList({
             {/* The Conversation Row Button */}
             <button
               onClick={() => onSelect(conv.id)}
-              className={`w-full text-left px-4 py-3 flex flex-col justify-center transition-all duration-base cursor-pointer border-l-accent ${
+              className={`w-full text-left px-4 py-3.5 sm:py-3 flex flex-col justify-center transition-all duration-base cursor-pointer border-l-accent ${
                 isActive
                   ? 'bg-surface-sidebarActive border-brand-primary pl-3.5'
                   : 'hover:bg-neutral-200/30 border-transparent'
@@ -79,7 +79,7 @@ export function ConversationList({
             </button>
 
             {/* Hover Action Overlay Row */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-fast bg-gradient-to-l from-surface-raised via-surface-raised/95 to-transparent pl-4 py-1 rounded-l-md">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-fast bg-gradient-to-l from-surface-raised via-surface-raised/95 to-transparent pl-4 py-1 rounded-l-md">
               {/* Pin/Unpin Button */}
               <button
                 onClick={(e) => {
@@ -87,7 +87,7 @@ export function ConversationList({
                   onTogglePin(conv.id)
                 }}
                 title={isPinned ? 'Unpin' : 'Pin'}
-                className="p-1.5 rounded hover:bg-neutral-200/40 text-text-muted hover:text-brand-primary transition-colors cursor-pointer"
+                className="w-touch h-touch flex items-center justify-center sm:w-auto sm:h-auto sm:p-1.5 rounded hover:bg-neutral-200/40 text-text-muted hover:text-brand-primary transition-colors cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +112,7 @@ export function ConversationList({
                   onDelete(conv.id)
                 }}
                 title="Delete exploration"
-                className="p-1.5 rounded hover:bg-semantic-error/10 text-text-muted hover:text-semantic-error transition-colors cursor-pointer"
+                className="w-touch h-touch flex items-center justify-center sm:w-auto sm:h-auto sm:p-1.5 rounded hover:bg-semantic-error/10 text-text-muted hover:text-semantic-error transition-colors cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

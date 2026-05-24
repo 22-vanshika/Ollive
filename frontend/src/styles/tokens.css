@@ -73,6 +73,9 @@
 
   /* ─── Component Sizing ───────────────────────────────────────────────────── */
   --sidebar-width: 17.5rem;      /* 280px — main conversation sidebar             */
+  --sidebar-width-tablet: 13.75rem; /* 220px — tablet conversation sidebar       */
+  --sidebar-width-mobile: 80vw;   /* 80% screen width — mobile drawer            */
+  --touch-target-min: 2.75rem;   /* 44px — mobile touch target minimum size       */
   --input-min-height: 1.75rem;   /* 28px  — textarea minimum height               */
   --input-max-height: 7.5rem;    /* 120px — textarea maximum height               */
   --bubble-max-width-user: 70%;  /* user bubble max width (right-aligned)         */

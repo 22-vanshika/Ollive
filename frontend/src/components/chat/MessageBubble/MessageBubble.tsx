@@ -43,7 +43,7 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
   if (isUser) {
     return (
       <div className="flex justify-end w-full mb-6 animate-message-fade-in">
-        <div className="max-w-bubble-user flex flex-col items-end">
+        <div className="max-w-[90%] sm:max-w-bubble-user flex flex-col items-end">
           {/* User Soft terracotta Bubble */}
           <div className="rounded-xl rounded-br-sm px-5 py-3.5 bg-user-bubble-bg text-user-bubble-text text-md font-sans leading-relaxed shadow-sm border border-brand-primary/5 select-text">
             {message.content}
@@ -94,14 +94,14 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
                 <span className="h-2 w-px bg-border" />
                 <span className="flex items-center gap-1">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-text-muted/70">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-13.5 18v-2.25z" />
                   </svg>
                   {stats.tokens}
                 </span>
               </div>
 
               {/* Action Buttons (visible on hover) */}
-              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-fast select-none">
+              <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-fast select-none">
                 {/* Copy Button */}
                 <button
                   onClick={handleCopy}

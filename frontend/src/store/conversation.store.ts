@@ -8,6 +8,8 @@ export const useConversationStore = create<ConversationState>((set) => ({
   isLoadingConversations: false,
   isLoadingMessages: false,
   isSending: false,
+  isSidebarOpen: false,
+  isSidebarCollapsed: false,
 
   setConversations: (conversations) => set({ conversations }),
   setActiveConversation: (id) => set({ activeConversationId: id }),
@@ -24,4 +26,6 @@ export const useConversationStore = create<ConversationState>((set) => ({
   setLoadingConversations: (loading) => set({ isLoadingConversations: loading }),
   setLoadingMessages: (loading) => set({ isLoadingMessages: loading }),
   setSending: (sending) => set({ isSending: sending }),
+  setSidebarOpen: (isOpen) => set({ isSidebarOpen: isOpen }),
+  setSidebarCollapsed: (isCollapsed) => set({ isSidebarCollapsed: isCollapsed }),
 }))

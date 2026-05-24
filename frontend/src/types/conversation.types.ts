@@ -52,6 +52,8 @@ export interface ConversationState {
   isLoadingConversations: boolean
   isLoadingMessages: boolean
   isSending: boolean
+  isSidebarOpen: boolean
+  isSidebarCollapsed: boolean
 
   setConversations: (conversations: Conversation[]) => void
   setActiveConversation: (id: string | null) => void
@@ -62,6 +64,8 @@ export interface ConversationState {
   setLoadingConversations: (loading: boolean) => void
   setLoadingMessages: (loading: boolean) => void
   setSending: (sending: boolean) => void
+  setSidebarOpen: (isOpen: boolean) => void
+  setSidebarCollapsed: (isCollapsed: boolean) => void
 }
 
 export interface UseConversationResult {

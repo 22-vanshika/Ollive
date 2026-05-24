@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { ConversationList, MessageBubble, ChatInput } from '@/components/chat'
 import { useConversation } from '@/hooks'
+import { useConversationStore } from '@/store'
 import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION, APP_VERSION } from '@/constants'
 
 export function ChatPage(): React.JSX.Element {
@@ -17,10 +18,18 @@ export function ChatPage(): React.JSX.Element {
     sendMessage,
   } = useConversation()
 
+  const {
+    isSidebarOpen,
+    isSidebarCollapsed,
+    setSidebarOpen,
+    setSidebarCollapsed,
+  } = useConversationStore()
+
   const bottomRef = useRef<HTMLDivElement>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showOverflowMenu, setShowOverflowMenu] = useState(false)
 
   // Local storage state for pinned conversation IDs
   const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
@@ -48,6 +57,17 @@ export function ChatPage(): React.JSX.Element {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Close mobile sidebar on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') {
+        setSidebarOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [setSidebarOpen])
 
   // Greeting based on hours
   const getGreeting = (): string => {
@@ -98,31 +118,68 @@ export function ChatPage(): React.JSX.Element {
 
   return (
     <div className="flex h-full w-full bg-surface-base select-none overflow-hidden font-sans">
+      {/* Mobile Drawer Overlay */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="md:hidden fixed inset-0 bg-neutral-900/40 backdrop-blur-sm z-[1050] transition-opacity duration-base"
+        />
+      )}
+
       {/* ─── Sidebar (Left Zone) ─── */}
-      <aside className="w-sidebar border-r border-border bg-surface-overlay flex flex-col shrink-0 h-full overflow-hidden select-none">
+      <aside
+        className={[
+          'fixed inset-y-0 left-0 z-modal flex flex-col shrink-0 h-full overflow-hidden select-none border-r border-border bg-surface-overlay transition-all duration-slow',
+          'md:relative md:translate-x-0 md:z-auto',
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          isSidebarCollapsed
+            ? 'md:w-0 md:border-r-0 lg:w-sidebar lg:border-r'
+            : 'w-sidebarMobile md:w-sidebarTablet lg:w-sidebar',
+        ].join(' ')}
+      >
         {/* Sidebar Header */}
         <div className="px-6 py-4 flex flex-col gap-3 shrink-0">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-lg font-bold text-text-primary tracking-wide">
               Explorations
             </h2>
-            {/* Elegant New Chat Button inside sidebar */}
-            <button
-              onClick={createNewConversation}
-              className="p-1.5 rounded-full bg-brand-primary text-text-inverse hover:opacity-95 active:scale-95 transition-all shadow-sm cursor-pointer"
-              title="Start a new exploration"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2.5"
-                stroke="currentColor"
-                className="w-4 h-4"
+            <div className="flex items-center gap-2">
+              {/* Elegant New Chat Button inside sidebar */}
+              <button
+                onClick={createNewConversation}
+                className="p-1.5 rounded-full bg-brand-primary text-text-inverse hover:opacity-95 active:scale-95 transition-all shadow-sm cursor-pointer"
+                title="Start a new exploration"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </button>
+
+              {/* Mobile Drawer Close Button */}
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="md:hidden w-touch h-touch flex items-center justify-center rounded-full hover:bg-neutral-200/40 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+                title="Close sidebar"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Search Box */}
@@ -224,9 +281,48 @@ export function ChatPage(): React.JSX.Element {
 
       {/* ─── Main Chat Workspace (Right Zone) ─── */}
       <main className="flex-1 flex flex-col min-w-0 h-full relative overflow-hidden bg-surface-base">
+        {/* Toggle Collapse Button on Tablet */}
+        <button
+          onClick={() => setSidebarCollapsed(!isSidebarCollapsed)}
+          className="hidden md:flex lg:hidden absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-border bg-surface-raised items-center justify-center text-text-secondary hover:text-text-primary hover:bg-neutral-100 shadow-sm cursor-pointer z-dropdown active:scale-95 transition-all"
+          title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="2.5"
+            stroke="currentColor"
+            className={[
+              'w-3.5 h-3.5 transition-transform duration-base',
+              isSidebarCollapsed ? 'rotate-180' : '',
+            ].join(' ')}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+
         {/* Slim Header Bar */}
         <header className="h-14 border-b border-border bg-surface-base px-6 flex items-center justify-between shrink-0 select-none">
           <div className="flex items-center gap-3 min-w-0 flex-1">
+            {/* Hamburger Button on Mobile */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden w-touch h-touch flex items-center justify-center rounded-md hover:bg-neutral-200/40 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+              title="Open sidebar"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="2"
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+
             <span className="h-2 w-2 rounded-full bg-brand-secondary/80 shrink-0" />
             <h3 className="text-sm font-semibold text-text-primary truncate">
               {activeConversationId
@@ -239,10 +335,10 @@ export function ChatPage(): React.JSX.Element {
           {/* Action Row */}
           {activeConversationId && (
             <div className="flex items-center gap-1 shrink-0">
-              {/* Keyboard Shortcuts Button */}
+              {/* Keyboard Shortcuts Button (Desktop Only) */}
               <button
                 onClick={() => setShowShortcuts(true)}
-                className="p-1.5 rounded-md hover:bg-neutral-200/40 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+                className="hidden md:block p-1.5 rounded-md hover:bg-neutral-200/40 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
                 title="Keyboard Shortcuts"
               >
                 <svg
@@ -258,12 +354,12 @@ export function ChatPage(): React.JSX.Element {
                 </svg>
               </button>
 
-              {/* Export Markdown Button */}
+              {/* Export Markdown Button (Desktop Only) */}
               <button
                 onClick={handleExportMarkdown}
                 disabled={messages.length === 0}
                 className={[
-                  'p-1.5 rounded-md transition-colors cursor-pointer',
+                  'hidden md:block p-1.5 rounded-md transition-colors cursor-pointer',
                   messages.length === 0
                     ? 'text-text-muted/40 cursor-not-allowed'
                     : 'hover:bg-neutral-200/40 text-text-muted hover:text-text-primary',
@@ -281,6 +377,77 @@ export function ChatPage(): React.JSX.Element {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                 </svg>
               </button>
+
+              {/* Mobile Overflow Menu */}
+              <div className="relative md:hidden">
+                <button
+                  onClick={() => setShowOverflowMenu(!showOverflowMenu)}
+                  className="w-touch h-touch flex items-center justify-center rounded-md hover:bg-neutral-200/40 text-text-muted hover:text-text-primary transition-colors cursor-pointer"
+                  title="More actions"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2.5"
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" />
+                  </svg>
+                </button>
+
+                {showOverflowMenu && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-dropdown"
+                      onClick={() => setShowOverflowMenu(false)}
+                    />
+                    <div className="absolute right-0 mt-1 w-48 bg-surface-raised border border-border shadow-lg rounded-lg py-1 z-modal animate-message-fade-in font-sans text-xs">
+                      <button
+                        onClick={() => {
+                          setShowOverflowMenu(false)
+                          setShowShortcuts(true)
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-text-primary flex items-center gap-2 cursor-pointer font-medium"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-4 h-4 text-text-muted"
+                        >
+                          <rect x="2" y="4" width="20" height="16" rx="3" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10" />
+                        </svg>
+                        Help & Shortcuts
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowOverflowMenu(false)
+                          handleExportMarkdown()
+                        }}
+                        disabled={messages.length === 0}
+                        className="w-full text-left px-4 py-3 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-text-primary flex items-center gap-2 cursor-pointer font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth="1.5"
+                          stroke="currentColor"
+                          className="w-4 h-4 text-text-muted"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        Export Exploration
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </header>
@@ -356,9 +523,9 @@ export function ChatPage(): React.JSX.Element {
           /* Active Messages list */
           <div
             ref={messageListRef}
-            className="flex-1 overflow-y-auto custom-scrollbar px-10 py-6 flex flex-col min-w-0"
+            className="flex-1 overflow-y-auto custom-scrollbar px-5 py-6 flex flex-col min-w-0 2xl:px-16 2xl:py-8"
           >
-            <div className="max-w-3xl w-full mx-auto flex flex-col">
+            <div className="max-w-3xl w-full mx-auto flex flex-col 2xl:max-w-4xl">
               {messages.map((msg) => (
                 <MessageBubble key={msg.id} message={msg} />
               ))}
