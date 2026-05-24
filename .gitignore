@@ -1,5 +1,4 @@
 backend/.env
-backend/alembic.ini
 frontend/.env
 .DS_Store
 node_modules/
