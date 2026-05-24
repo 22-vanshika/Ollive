@@ -8,5 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Run migrations then start the server
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000
+RUN chmod +x start.sh
+
+# JSON form prevents OS signal issues; start.sh runs migrations then uvicorn
+CMD ["sh", "start.sh"]
