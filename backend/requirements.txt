@@ -1,8 +1,8 @@
-# Runtime dependencies — installed by Vercel during build
 fastapi>=0.111.0
 sqlalchemy[asyncio]>=2.0.30
-asyncpg>=0.29.0
+psycopg[async,binary]>=3.1.19
 alembic>=1.13.1
+psycopg2-binary>=2.9.9
 pydantic>=2.7.1
 pydantic-settings>=2.2.1
 groq>=0.9.0

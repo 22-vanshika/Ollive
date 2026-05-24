@@ -19,8 +19,19 @@ _settings = get_settings()
 # pool_size=10, max_overflow=20, pool_pre_ping=True instead.
 _is_serverless = _settings.app_env == "production"
 
-engine = create_async_engine(
+# Swap asyncpg → psycopg (v3) driver in the URL for Vercel.
+# asyncpg uses Python asyncio sockets directly and fails with
+# OSError EADDRNOTAVAIL in Vercel's Lambda network environment.
+# psycopg3 uses libpq for networking which works correctly.
+import re as _re
+_db_url = _re.sub(
+    r"^postgresql\+asyncpg://",
+    "postgresql+psycopg://",
     _settings.database_url,
+) if _is_serverless else _settings.database_url
+
+engine = create_async_engine(
+    _db_url,
     echo=_settings.app_env == "development",
     **({"poolclass": NullPool} if _is_serverless else {
         "pool_size": 10,
