@@ -8,18 +8,21 @@
       }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "https://ollive-production.up.railway.app/api/:path*"
+      "src": "/api/(.*)",
+      "dest": "https://ollive-production.up.railway.app/api/$1"
     },
     {
-      "source": "/health",
-      "destination": "https://ollive-production.up.railway.app/health"
+      "src": "/health",
+      "dest": "https://ollive-production.up.railway.app/health"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
