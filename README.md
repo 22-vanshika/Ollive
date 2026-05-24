@@ -1,91 +1,347 @@
-# Ollive — LLM Inference Logger & Chat App
+# Ollive — LLM Inference Logger
 
-Ollive is a full-stack LLM inference logger and chat application. It provides a React-based conversational interface and a high-performance FastAPI backend that reliably tracks, redacts, and stores LLM inference metrics.
+> A production-grade chatbot with an embedded inference logging SDK, real-time ingestion pipeline, and operational telemetry dashboard.
 
-## 🚀 Setup Instructions
+**Live demo →** `[your Vercel URL here]`
+**Architecture notes (Notion) →** `[your Notion link here]`
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Setup](#setup)
+- [Schema Design](#schema-design)
+- [Tradeoffs](#tradeoffs)
+- [What I'd Improve](#what-id-improve-with-more-time)
+- [Bonus Task Status](#bonus-task-status)
+- [Project Structure](#project-structure)
+
+---
+
+## Overview
+
+Most LLM applications are black boxes — you send a prompt, you get a response, and everything in between disappears. Ollive solves this by wrapping every inference call in a lightweight SDK that captures latency, token usage, error rates, and session context, then ships that data asynchronously to a purpose-built ingestion pipeline.
+
+**What's built:**
+
+| Component | Description |
+|---|---|
+| **Chatbot UI** | Multi-turn conversations with real-time streaming token output, conversation history (pin, resume, delete), and full markdown + syntax highlighting |
+| **SDK / Middleware** | TypeScript logger that measures end-to-end latency, captures token usage, redacts PII, and ships logs via `navigator.sendBeacon` — non-blocking and survives page unload |
+| **Ingestion API** | FastAPI endpoint that validates, deduplicates (by `request_id`), PII-scrubs (defensive second pass), and persists every log entry |
+| **Telemetry Dashboard** | Live stats: total requests, average latency, total tokens, error rate with configurable thresholds, latency time-series chart, and a recent inference feed table |
+
+---
+
+## Architecture
+
+```
+┌────────────────────────────────────────────────────────────┐
+│                   Browser  (React + Vite)                  │
+│                                                            │
+│  ┌──────────────────┐    ┌─────────────────────────────┐  │
+│  │    Chat UI       │    │        SDK Logger            │  │
+│  │                  │    │  ① measure latency           │  │
+│  │  send message ───┼──► │  ② capture token counts      │  │
+│  │  stream tokens ◄─┼──  │  ③ redact PII                │  │
+│  └──────────────────┘    │  ④ ship log (sendBeacon)     │  │
+│                          └──────────────┬───────────────┘  │
+└──────────────────┬───────────────────────┼──────────────────┘
+                   │ NDJSON stream         │ fire-and-forget
+                   │ POST /api/v1/chat     │ POST /api/v1/ingest
+                   ▼                       ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  FastAPI Backend  (Railway)                  │
+│                                                             │
+│  /api/v1/chat ──────────────────► Groq API (Llama 3.3 70B) │
+│        │  StreamingResponse (NDJSON, token-by-token)        │
+│        │                                                    │
+│  /api/v1/ingest                                             │
+│        │  validate → deduplicate → PII redact → persist     │
+│        │                                                    │
+│  /api/v1/metrics, /metrics/latency, /metrics/recent         │
+│  /api/v1/conversations  (CRUD + pin)                        │
+│        │                                                    │
+│    SQLAlchemy 2 (async) ──► asyncpg                         │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+                             ▼
+               ┌─────────────────────────┐
+               │  PostgreSQL  (Supabase)  │
+               │                         │
+               │  conversations          │
+               │  messages               │
+               │  inference_logs         │
+               └─────────────────────────┘
+```
+
+**Key design decisions:**
+
+- **API key never in the browser** — the frontend proxies all LLM calls through the FastAPI backend; no provider credentials exist on the client.
+- **Non-blocking log shipping** — `navigator.sendBeacon` queues the log payload before returning control to the UI. A `fetch` fallback fires only if the beacon queue is full. Either way, a failed log ship is silently swallowed so it never surfaces an error to the user.
+- **Dual-layer PII redaction** — the SDK redacts before shipping; the ingestion service redacts again before writing to the DB. The second pass is a hard boundary guarantee that holds regardless of SDK version.
+- **Open/closed provider pattern** — the `ProviderAdapter` interface means adding OpenAI, Anthropic, or Gemini is one new adapter file. No existing code changes.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, Vite 8, TypeScript 6 |
+| Styling | Tailwind CSS 3 with a full CSS custom-property design token system |
+| State | Zustand 5 |
+| Markdown | react-markdown 10 + react-syntax-highlighter 16 (Prism / solarizedlight) |
+| Backend | FastAPI + Uvicorn |
+| ORM | SQLAlchemy 2 (fully async) + asyncpg |
+| Migrations | Alembic |
+| Validation | Pydantic v2 + pydantic-settings |
+| LLM | Groq API — Llama 3.3 70B Versatile |
+| Database | PostgreSQL via Supabase |
+| Frontend deploy | Vercel |
+| Backend deploy | Railway |
+| Containers | Docker + Docker Compose |
+
+---
+
+## Setup
 
 ### Prerequisites
-- **Node.js** (v18+)
-- **Python** (v3.10+)
-- **PostgreSQL** (Optional if using SQLite locally)
 
-### Frontend (Vite + React)
+- [Docker](https://docs.docker.com/get-docker/) (recommended) **or** Node.js 20+ and Python 3.12+
+- A Groq API key — [console.groq.com/keys](https://console.groq.com/keys) (free)
+- A PostgreSQL database — [Supabase](https://supabase.com) free tier works, or the Docker Compose stack spins one up automatically
+
+### Option A — Docker (one command)
+
 ```bash
-cd frontend
-npm install
-npm run dev
-```
-The frontend will run on `http://localhost:5173`. It expects the backend to be running on `http://localhost:8000`.
+# 1. Clone and enter the repo
+git clone https://github.com/22-vanshika/Ollive.git && cd Ollive
 
-### Backend (FastAPI + SQLAlchemy)
+# 2. Set your Groq API key (the only required secret)
+echo "GROQ_API_KEY=gsk_..." > .env
+
+# 3. Start everything
+docker compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Chat UI | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| API docs (Swagger) | http://localhost:8000/docs |
+
+The compose stack automatically runs `alembic upgrade head` before starting the backend, so no manual migration step is needed.
+
+### Option B — Manual (local dev)
+
+**Backend**
+
 ```bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# Run database migrations
-alembic upgrade head
+# Copy and fill in environment variables
+cp ../.env.example .env
+# → set DATABASE_URL and GROQ_API_KEY
 
-# Start the development server
-fastapi dev app/main.py
+alembic upgrade head             # apply all migrations
+uvicorn app.main:app --reload --port 8000
 ```
-The backend API and interactive docs will be available at `http://localhost:8000/docs`.
+
+**Frontend** (new terminal)
+
+```bash
+cd frontend
+npm install
+npm run dev                      # http://localhost:5173
+```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | ✅ | `postgresql+asyncpg://user:pass@host:5432/dbname` |
+| `GROQ_API_KEY` | ✅ | From [console.groq.com/keys](https://console.groq.com/keys) |
+| `APP_ENV` | — | `development` / `staging` / `production` (default: `development`) |
+| `CORS_ORIGINS` | — | JSON array: `["http://localhost:5173"]` |
+| `LOG_LEVEL` | — | `DEBUG` / `INFO` / `WARNING` (default: `INFO`) |
 
 ---
 
-## 🏗 Architecture Overview
+## Schema Design
 
-Ollive is built on a modern, typed stack designed for speed and reliability:
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS, and Zustand for state management. It also includes an integrated SDK (`src/sdk`) for tracking inference calls.
-- **Backend**: Python, FastAPI, SQLAlchemy (Async), and Alembic for migrations.
-- **Database**: Relational SQL (PostgreSQL/SQLite) using asynchronous drivers for non-blocking database I/O.
+### `conversations`
+
+Thin session record. All heavy data lives in child tables.
+
+```sql
+id         UUID  PRIMARY KEY DEFAULT gen_random_uuid()
+title      TEXT                       -- nullable; auto-filled by LLM after first exchange
+pinned     BOOLEAN NOT NULL DEFAULT false
+created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+```
+
+`title` is nullable on creation and populated asynchronously after the first turn via a non-blocking summarisation call. This avoids a blocking round-trip before the user can start chatting.
+
+### `messages`
+
+Append-only turn log.
+
+```sql
+id              UUID  PRIMARY KEY
+conversation_id UUID  NOT NULL  REFERENCES conversations(id) ON DELETE CASCADE
+role            TEXT  NOT NULL  -- 'user' | 'assistant' | 'system'
+content         TEXT  NOT NULL
+created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+```
+
+Index on `conversation_id` — every message load is filtered by it.
+
+### `inference_logs`
+
+One row per LLM API call. The core observability table.
+
+```sql
+id                UUID  PRIMARY KEY
+conversation_id   UUID  REFERENCES conversations(id) ON DELETE SET NULL  -- survives conversation deletion
+session_id        UUID  NOT NULL
+request_id        UUID  NOT NULL  UNIQUE   -- idempotency key
+provider          TEXT  NOT NULL
+model             TEXT  NOT NULL
+timestamp_request TIMESTAMPTZ NOT NULL
+timestamp_response TIMESTAMPTZ NOT NULL
+latency_ms        INTEGER NOT NULL
+prompt_tokens     INTEGER NOT NULL
+completion_tokens INTEGER NOT NULL
+total_tokens      INTEGER NOT NULL
+status            TEXT NOT NULL   -- 'success' | 'error' | 'timeout'
+error_code        TEXT
+input_preview     TEXT            -- first 200 chars, PII-redacted
+output_preview    TEXT            -- first 200 chars, PII-redacted
+created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+```
+
+**Indexes (with justification):**
+
+| Index | Serves | Beneficial from |
+|---|---|---|
+| `ix_inference_logs_conversation_id` | Dashboard timeline, per-conversation metrics | Row 1 — every conversation detail view hits it |
+| `ix_inference_logs_session_id` | SDK-level session replay | ~1 000+ rows when sessions fan out |
+| `ix_inference_logs_request_id` (unique) | Idempotency check on every ingest | Row 1 — every ingest hits it |
+
+`conversation_id` is `ON DELETE SET NULL` — inference logs are observability data and should outlive the conversation they came from. Deleting a chat does not purge its telemetry.
 
 ---
 
-## 💾 Schema Design Decisions
+## Tradeoffs
 
-- **Denormalized Metrics**: Token counts (prompt, completion, total), latencies, and metadata (provider, model) are stored directly on the `inference_logs` table. This avoids expensive `JOIN` operations when calculating system-wide aggregations and metrics.
-- **Strategic Indexing**: 
-  - `conversation_id` is indexed for lightning-fast timeline rendering in the UI.
-  - `session_id` is indexed for SDK-level session replays.
-  - `request_id` has a strict unique constraint to ensure idempotency.
-- **Foreign Key Policies**: `conversation_id` on the `inference_logs` table uses `ON DELETE SET NULL`. If a user deletes their chat history, the conversation is wiped, but the anonymized inference metrics remain intact for global system analytics.
+**Synchronous HTTP ingestion over a message queue**
+Logs are written inside the HTTP request via direct `asyncpg` writes, not via Kafka or Redis Streams. This keeps infrastructure to zero: no broker to deploy or monitor. At the current scale it holds fine; under sustained high write volume, a queue would decouple ingestion throughput from database capacity.
 
----
+**Frontend SDK over a server-side proxy interceptor**
+Logging runs in the browser SDK rather than intercepting at a server-side proxy. This keeps the FastAPI backend stateless and avoids a second network hop on the hot path. The risk is that `sendBeacon` delivery is best-effort; a hard browser crash before the beacon fires loses that single log entry. Acceptable for observability data — a missed log is not a missed transaction.
 
-## ⚖️ Tradeoffs Made
+**Groq / Llama 3.3 70B as the sole provider**
+The provider adapter is fully abstracted — switching to OpenAI, Anthropic, or Gemini is one new adapter file. Groq was chosen because its free tier has generous RPM limits and Llama 3.3 70B produces high-quality streamed output without per-token cost pressure during development.
 
-1. **Synchronous DB Writes vs. Queueing**: Currently, inference logs are written directly to the database within the HTTP request lifecycle. 
-   - *Tradeoff*: This provides immediate read-after-write consistency and drastically simplifies the architecture. However, under massive ingestion load, it could cause database connection bottlenecks compared to an asynchronous message queue (like Kafka/Redis) that batches writes.
-2. **Operational DB for Analytics**: We are storing inference logs in the primary operational database (PostgreSQL/SQLite) rather than a dedicated OLAP database (like ClickHouse). 
-   - *Tradeoff*: This keeps the infrastructure footprint small and easy to deploy, but as the dataset grows to millions of rows, analytical queries (SUM, AVG) over the logs will become slower.
+**Supabase over self-managed PostgreSQL**
+Zero operational overhead for a managed PostgreSQL instance with built-in PgBouncer connection pooling. No Supabase-specific code exists in the schema or query layer — migrating to any PostgreSQL host is a single connection string change.
 
----
-
-## 📝 Architecture Notes
-
-### Ingestion Flow
-1. The frontend or SDK sends an inference payload to the `/api/v1/ingest` endpoint.
-2. The service performs an **idempotency check** against the unique `request_id` to reject duplicate payloads caused by network retries.
-3. The payload passes through a **Defensive Redaction layer** (`pii_service.redact`). This acts as a strict service boundary guarantee, ensuring that even if a client fails to redact sensitive information, no raw PII ever touches the database.
-4. The sanitized log is written asynchronously to the database.
-
-### Logging Strategy
-To prevent explosive database growth, Ollive does not log full conversational payloads in the transactional database. Instead, it logs **input and output previews** alongside hard metrics (token counts, latency, status codes). 
-
-### Scaling Considerations
-The read paths are heavily optimized with composite indices, meaning dashboard queries will remain fast. The primary scaling bottleneck will be write-heavy ingestion. The use of asynchronous SQLAlchemy (`AsyncSession`) mitigates thread-blocking, allowing the FastAPI server to handle thousands of concurrent connections efficiently.
-
-### Failure Handling Assumptions
-- **Network Partitions**: The system assumes network failures will happen between the SDK and the backend. It relies on the client retrying requests with the same `request_id`, which the backend safely ignores via the idempotency constraint.
-- **LLM Provider Outages**: External provider errors are gracefully caught, and the `status` column in the log is marked as `"error"`, storing the specific `error_code` for monitoring without crashing the ingestion flow.
+**Simulated per-message token stats in the chat UI**
+The latency and token counts shown beneath each assistant bubble are derived client-side from a deterministic hash of the message ID and content length — they are display conveniences, not real values. Real confirmed values come from `inference_logs` via the dashboard. In a v2, the message component would read confirmed values written back from the ingestion endpoint.
 
 ---
 
-## 🚀 What I Would Improve With More Time
+## What I'd Improve With More Time
 
-1. **Decoupled Ingestion Pipeline**: Introduce Redis or RabbitMQ to queue incoming inference logs. A background worker would then batch-insert logs into the database, drastically increasing write throughput and protecting the database from sudden traffic spikes.
-2. **OLAP Migration**: Move the `inference_logs` table to a columnar database like ClickHouse or TimescaleDB to support real-time sub-second analytics over massive datasets.
-3. **Advanced PII Redaction**: Replace the current PII redaction logic with a specialized lightweight NLP model (e.g., Microsoft Presidio) to detect and mask complex edge cases (like contextual names or obscure identifiers) dynamically.
-4. **Rate Limiting**: Implement API rate limiting on the `/api/v1/ingest` endpoint using Redis to prevent malicious actors from flooding the database with forged logs.
+1. **Event-based ingestion** — replace the direct HTTP ingest call with a message queue (Redis Streams, SQS, or Kafka). The ingestion service becomes a consumer, decoupling write volume from latency and enabling fan-out to multiple processors (alerting, aggregation, archival).
+
+2. **Real-time dashboard** — the dashboard is a point-in-time fetch on load. WebSockets or Server-Sent Events would push new `inference_log` rows to the dashboard the moment they land.
+
+3. **Streaming abort** — the send button disables during generation but has no cancel mechanism. An `AbortController` on the fetch call plus a cancel button in the UI is a small change with a big UX impact on long responses.
+
+4. **Retry queue for failed log ships** — `sendBeacon` failures are silently swallowed. A lightweight IndexedDB queue with exponential-backoff retry would prevent data loss under flaky mobile connections.
+
+5. **Authentication** — no auth layer exists. Supabase Auth (JWT) would be the lowest-friction addition before any multi-user deployment.
+
+6. **OLAP for analytics at scale** — inference logs currently live in the primary operational PostgreSQL. At millions of rows, analytical aggregations (SUM, AVG, GROUP BY hour) will slow. Moving `inference_logs` to TimescaleDB or ClickHouse keeps the operational DB fast.
+
+7. **Self-hosted Kubernetes** — the application is on Railway + Vercel (PaaS). Writing `Deployment`, `Service`, `Ingress`, `HPA`, `ConfigMap`, and `Secret` manifests would enable self-hosted production deployment with horizontal scaling and cost control.
+
+---
+
+## Bonus Task Status
+
+### ✅ Completed — 8 / 10
+
+| Bonus | How it's implemented |
+|---|---|
+| **Multi-provider support** | `provider-adapter.ts` exposes a `ProviderAdapter` interface. `createProviderAdapter(id)` is a factory. Adding OpenAI or Anthropic = one new object implementing the interface + one new `case`. Zero changes to existing code. |
+| **Streaming responses** | Backend returns `StreamingResponse(media_type="application/x-ndjson")`. Frontend reads `response.body` as a `ReadableStream`, parses each newline-delimited JSON chunk, and calls `onChunk(token)` to update the UI incrementally. |
+| **Latency + Throughput + Errors dashboards** | Three StatCards (total requests, avg latency, total tokens), a latency time-series chart, an error rate card with 5% elevated / 10% critical thresholds, an AI analysis card, and a live recent inference table. |
+| **PII redaction** | SDK redacts before shipping (email, phone, SSN, card numbers, API keys, Bearer tokens). Ingestion service runs the same rules again as a hard boundary before writing to the DB. |
+| **Docker Compose one-command setup** | `docker compose up --build` starts PostgreSQL + backend (with auto-migration) + frontend served via nginx with an API proxy. |
+| **List conversations** | Sidebar with full conversation list, relative timestamps, pin indicators, delete action. |
+| **Resume a conversation** | Clicking any sidebar item loads the full message history from the database via `GET /api/v1/conversations/{id}`. |
+| **Delete / cancel a conversation** | Trash icon in the sidebar calls `DELETE /api/v1/conversations/{id}`. Cascade deletes messages. Inference logs are preserved (`ON DELETE SET NULL`). |
+
+### ❌ Not completed — 2 / 10
+
+| Bonus | Effort estimate | Notes |
+|---|---|---|
+| **Event-based architecture** | 1–2 days | Would need a broker (Redis Streams / SQS / Kafka), a producer in the SDK/ingest route, and a consumer worker. The HTTP path works at this scale but is not decoupled. |
+| **Self-hosted Kubernetes** | 1 day of manifests + cluster setup | App currently deploys to Railway + Vercel (PaaS). k8s manifests would need `Deployment`, `Service`, `Ingress`, `HPA`, `ConfigMap`, `Secret`, and a container registry pipeline. |
+
+---
+
+## Project Structure
+
+```
+ollive/
+├── docker-compose.yml
+├── .env.example
+│
+├── backend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── app/
+│       ├── api/v1/
+│       │   ├── chat.py           # POST /chat — streaming LLM proxy
+│       │   ├── conversations.py  # CRUD + PATCH /pin
+│       │   ├── ingest.py         # POST /ingest
+│       │   └── metrics.py        # GET /metrics*
+│       ├── core/                 # Config, DB session, exceptions
+│       ├── models/               # SQLAlchemy ORM models
+│       ├── repositories/         # All SQL lives here
+│       ├── schemas/              # Pydantic I/O models
+│       └── services/             # Business logic (no HTTP, no SQL)
+│           ├── chat_service.py
+│           ├── conversation_service.py
+│           ├── ingestion_service.py
+│           └── pii_service.py    # Regex-based PII redaction
+│
+├── frontend/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── src/
+│       ├── components/
+│       │   ├── chat/             # MessageBubble, ChatInput, MarkdownRenderer…
+│       │   └── dashboard/        # StatCard, LatencyChart, ErrorRateCard
+│       ├── hooks/                # useConversation, useInferenceMetrics
+│       ├── pages/                # ChatPage, DashboardPage
+│       ├── sdk/                  # logger.ts, pii-redactor.ts, provider-adapter.ts
+│       ├── services/             # All fetch() calls (no fetch in components)
+│       ├── store/                # Zustand store
+│       ├── types/                # All TypeScript interfaces
+│       └── constants/            # API endpoints, model IDs, timeouts
+│
+└── migrations/
+    └── versions/                 # Alembic versioned migrations
+```
