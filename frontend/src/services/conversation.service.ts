@@ -13,6 +13,7 @@ function mapConversation(raw: ApiConversation): Conversation {
   return {
     id: raw.id,
     title: raw.title,
+    pinned: raw.pinned,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
   }
@@ -94,6 +95,18 @@ export async function updateConversationTitle(id: string, title: string): Promis
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
   })
   if (!response.ok) throw new Error(`Failed to update conversation title: ${response.status}`)
+  const data = (await response.json()) as ApiConversation
+  return mapConversation(data)
+}
+
+export async function pinConversation(id: string, pinned: boolean): Promise<Conversation> {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CONVERSATION_PIN(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pinned }),
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+  })
+  if (!response.ok) throw new Error(`Failed to pin conversation: ${response.status}`)
   const data = (await response.json()) as ApiConversation
   return mapConversation(data)
 }

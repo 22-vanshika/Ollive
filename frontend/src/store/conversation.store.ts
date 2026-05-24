@@ -17,6 +17,10 @@ export const useConversationStore = create<ConversationState>((set) => ({
     set((state) => ({
       messages: state.messages.map((m) => (m.id === id ? { ...m, ...patch } : m)),
     })),
+  updateConversation: (id, patch) =>
+    set((state) => ({
+      conversations: state.conversations.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    })),
   setLoadingConversations: (loading) => set({ isLoadingConversations: loading }),
   setLoadingMessages: (loading) => set({ isLoadingMessages: loading }),
   setSending: (sending) => set({ isSending: sending }),

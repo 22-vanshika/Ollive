@@ -80,7 +80,13 @@ export function DashboardPage(): React.JSX.Element {
               </div>
 
               <div className="flex flex-col gap-2.5 text-xs font-sans text-text-secondary leading-relaxed">
-                {!metrics || metrics.totalRequests === 0 ? (
+                {isLoading ? (
+                  <>
+                    <div className="h-3 rounded bg-neutral-200/70 animate-pulse w-4/5" />
+                    <div className="h-3 rounded bg-neutral-200/70 animate-pulse w-full" />
+                    <div className="h-3 rounded bg-neutral-200/70 animate-pulse w-3/4" />
+                  </>
+                ) : !metrics || metrics.totalRequests === 0 ? (
                   <>
                     <div className="flex gap-2.5 items-start">
                       <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-text-muted shrink-0" />

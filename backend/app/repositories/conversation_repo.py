@@ -59,18 +59,30 @@ async def update_title(
     return conversation
 
 
+async def set_pinned(
+    session: AsyncSession, conversation_id: uuid.UUID, *, pinned: bool
+) -> Conversation | None:
+    conversation = await get_by_id(session, conversation_id)
+    if conversation is None:
+        return None
+    conversation.pinned = pinned
+    await session.flush()
+    await session.refresh(conversation)
+    return conversation
+
+
 async def delete(session: AsyncSession, conversation_id: uuid.UUID) -> bool:
     conversation = await get_by_id(session, conversation_id)
     if conversation is None:
         return False
-    
+
     # Cascade delete to inference logs directly to clear them and trigger live updates
     from sqlalchemy import delete as sql_delete
     from app.models.inference_log import InferenceLog
     await session.execute(
         sql_delete(InferenceLog).where(InferenceLog.conversation_id == conversation_id)
     )
-    
+
     await session.delete(conversation)
     await session.flush()
     return True

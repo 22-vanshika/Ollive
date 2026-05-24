@@ -9,11 +9,16 @@ class ConversationCreate(BaseModel):
     title: str | None = Field(default=None, max_length=255)
 
 
+class ConversationPinUpdate(BaseModel):
+    pinned: bool
+
+
 class ConversationResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
     title: str | None
+    pinned: bool
     created_at: datetime
     updated_at: datetime
 
@@ -38,6 +43,7 @@ class ConversationWithMessages(BaseModel):
 
     id: uuid.UUID
     title: str | None
+    pinned: bool
     created_at: datetime
     updated_at: datetime
     messages: list[MessageResponse]

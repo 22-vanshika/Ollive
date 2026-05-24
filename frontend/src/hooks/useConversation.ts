@@ -7,6 +7,7 @@ import {
   addMessage,
   deleteConversation as deleteConversationService,
   updateConversationTitle,
+  pinConversation,
 } from '@/services'
 import { loggedLLMCall } from '@/sdk'
 import { DEFAULT_MODEL, DEFAULT_MAX_TOKENS, DEFAULT_PROVIDER, UNTITLED_CONVERSATION } from '@/constants'
@@ -25,6 +26,7 @@ export function useConversation(): UseConversationResult {
     setMessages,
     appendMessage,
     updateMessage,
+    updateConversation,
     setLoadingConversations,
     setLoadingMessages,
     setSending,
@@ -77,6 +79,20 @@ export function useConversation(): UseConversationResult {
       }
     },
     [conversations, activeConversationId, setActiveConversation, setConversations, setMessages],
+  )
+
+  const togglePin = useCallback(
+    async (id: string) => {
+      const current = useConversationStore.getState().conversations.find((c) => c.id === id)
+      if (!current) return
+      try {
+        const updated = await pinConversation(id, !current.pinned)
+        updateConversation(id, { pinned: updated.pinned })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    [updateConversation],
   )
 
   const sendMessage = useCallback(
@@ -218,5 +234,6 @@ export function useConversation(): UseConversationResult {
     selectConversation,
     deleteConversation: handleDeleteConversation,
     sendMessage,
+    togglePin,
   }
 }

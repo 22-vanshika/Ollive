@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.schemas.conversation import (
     ConversationCreate,
+    ConversationPinUpdate,
     ConversationResponse,
     ConversationWithMessages,
     MessageCreate,
@@ -49,6 +50,13 @@ async def update_conversation(
     return await conversation_service.update_conversation_title(
         session, conversation_id, payload
     )
+
+
+@router.patch("/{conversation_id}/pin", response_model=ConversationResponse)
+async def pin_conversation(
+    conversation_id: UUID, payload: ConversationPinUpdate, session: _Db
+) -> ConversationResponse:
+    return await conversation_service.pin_conversation(session, conversation_id, payload)
 
 
 @router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)

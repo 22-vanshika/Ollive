@@ -6,6 +6,7 @@ from app.core.exceptions import NotFoundError
 from app.repositories import conversation_repo, message_repo
 from app.schemas.conversation import (
     ConversationCreate,
+    ConversationPinUpdate,
     ConversationResponse,
     ConversationWithMessages,
     MessageCreate,
@@ -41,6 +42,17 @@ async def update_conversation_title(
 ) -> ConversationResponse:
     conversation = await conversation_repo.update_title(
         session, conversation_id, title=payload.title
+    )
+    if conversation is None:
+        raise NotFoundError(f"Conversation {conversation_id} not found.")
+    return ConversationResponse.model_validate(conversation)
+
+
+async def pin_conversation(
+    session: AsyncSession, conversation_id: uuid.UUID, payload: ConversationPinUpdate
+) -> ConversationResponse:
+    conversation = await conversation_repo.set_pinned(
+        session, conversation_id, pinned=payload.pinned
     )
     if conversation is None:
         raise NotFoundError(f"Conversation {conversation_id} not found.")

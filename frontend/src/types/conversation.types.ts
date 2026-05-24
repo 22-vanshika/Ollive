@@ -14,6 +14,7 @@ export interface Message {
 export interface Conversation {
   id: string
   title: string | null
+  pinned: boolean
   createdAt: string
   updatedAt: string
 }
@@ -27,6 +28,7 @@ export interface ConversationDetail {
 export interface ApiConversation {
   id: string
   title: string | null
+  pinned: boolean
   created_at: string
   updated_at: string
 }
@@ -56,6 +58,7 @@ export interface ConversationState {
   setMessages: (messages: Message[]) => void
   appendMessage: (message: Message) => void
   updateMessage: (id: string, patch: Partial<Message>) => void
+  updateConversation: (id: string, patch: Partial<Conversation>) => void
   setLoadingConversations: (loading: boolean) => void
   setLoadingMessages: (loading: boolean) => void
   setSending: (sending: boolean) => void
@@ -72,4 +75,5 @@ export interface UseConversationResult {
   selectConversation: (id: string) => Promise<void>
   deleteConversation: (id: string) => Promise<void>
   sendMessage: (content: string) => Promise<void>
+  togglePin: (id: string) => Promise<void>
 }
