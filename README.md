@@ -3,6 +3,7 @@
 > A production-grade chatbot with an embedded inference logging SDK, real-time ingestion pipeline, and operational telemetry dashboard.
 
 **Live demo →** [https://ollive-murex.vercel.app/](https://ollive-murex.vercel.app/)
+
 **Architecture notes (Notion) →** [https://www.notion.so/ARCHITECTURE-36aa0469ae7880998abdccf1c3a9b2e5](https://www.notion.so/ARCHITECTURE-36aa0469ae7880998abdccf1c3a9b2e5)
 
 ---
