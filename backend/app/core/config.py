@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     app_port: int = 8000
     log_level: str = "INFO"
 
+    # Set to true only on stateless serverless platforms (Vercel).
+    # Railway / Render / VMs should leave this false (default).
+    serverless: bool = False
+
     # CORS — provide as a JSON array in .env: ["http://localhost:5173"]
     cors_origins: list[str] = Field(default=["http://localhost:5173"])
 
