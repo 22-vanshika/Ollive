@@ -465,48 +465,50 @@ export function ChatPage(): React.JSX.Element {
               </p>
 
               {/* Suggestions Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mt-10">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4 w-full mt-6 sm:mt-10">
                 {WELCOME_SUGGESTIONS.map((s) => {
                   // Custom sage green SVGs for suggestion categories
                   return (
                     <button
                       key={s.id}
                       onClick={() => handleSuggestionClick(s.description)}
-                      className="group p-5 text-left rounded-xl bg-surface-raised border border-border/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-base cursor-pointer focus:border-brand-primary"
+                      className="group p-3 sm:p-5 text-left rounded-xl bg-surface-raised border border-border/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-base cursor-pointer focus:border-brand-primary flex flex-col justify-between"
                     >
-                      <div className="flex items-center gap-3.5">
-                        {/* Soft Sage Circle */}
-                        <div className="h-8 w-8 rounded-full bg-brand-secondary/15 flex items-center justify-center text-brand-secondary shrink-0 group-hover:bg-brand-secondary/25 transition-colors">
-                          {s.category === 'creative' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                            </svg>
-                          )}
-                          {s.category === 'analytical' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                          )}
-                          {s.category === 'technical' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
-                            </svg>
-                          )}
-                          {s.category === 'editorial' && (
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l5.096-.813 10.814-10.814-4.283-4.283L9.813 15.904z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 8.5L15.5 5M3 12h5m-5 4h3m-3-8h7" />
-                            </svg>
-                          )}
+                      <div>
+                        <div className="flex items-center gap-2.5">
+                          {/* Soft Sage Circle */}
+                          <div className="h-6.5 w-6.5 sm:h-8 sm:w-8 rounded-full bg-brand-secondary/15 flex items-center justify-center text-brand-secondary shrink-0 group-hover:bg-brand-secondary/25 transition-colors">
+                            {s.category === 'creative' && (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                              </svg>
+                            )}
+                            {s.category === 'analytical' && (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                              </svg>
+                            )}
+                            {s.category === 'technical' && (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                              </svg>
+                            )}
+                            {s.category === 'editorial' && (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 sm:w-4 sm:h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l5.096-.813 10.814-10.814-4.283-4.283L9.813 15.904z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 8.5L15.5 5M3 12h5m-5 4h3m-3-8h7" />
+                              </svg>
+                            )}
+                          </div>
+                          <span className="text-xs sm:text-sm font-semibold text-text-primary truncate">
+                            {s.title}
+                          </span>
                         </div>
-                        <span className="text-sm font-semibold text-text-primary">
-                          {s.title}
-                        </span>
+                        <p className="text-[10px] sm:text-xs text-text-secondary/90 mt-2 font-normal leading-relaxed line-clamp-2 sm:line-clamp-none">
+                          {s.description}
+                        </p>
                       </div>
-                      <p className="text-xs text-text-secondary/90 mt-2 font-normal leading-relaxed">
-                        {s.description}
-                      </p>
                     </button>
                   )
                 })}

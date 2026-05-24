@@ -77,7 +77,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps): React.J
               viewBox="0 0 24 24"
               strokeWidth="2.5"
               stroke="currentColor"
-              className="w-4.5 h-4.5 sm:w-4 sm:h-4"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
             >
               <path
                 strokeLinecap="round"

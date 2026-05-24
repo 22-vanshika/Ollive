@@ -82,18 +82,18 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
 
           {/* Metadata & Actions row (only visible on hover or completed messages) */}
           {message.status === 'complete' && (
-            <div className="flex items-center justify-between mt-2 py-1 border-t border-border/40 min-h-input gap-4">
+            <div className="flex items-center justify-between mt-2 py-0.5 sm:py-1 border-t border-border/40 min-h-[1.75rem] gap-2 sm:gap-4">
               {/* Latency & Token stats */}
-              <div className="flex items-center gap-3 text-xs text-text-muted font-sans tracking-wide select-none">
-                <span className="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-text-muted/70">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 text-[10px] sm:text-xs text-text-muted font-sans tracking-wide select-none">
+                <span className="flex items-center gap-0.5 sm:gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-text-muted/70">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   {stats.latency}
                 </span>
-                <span className="h-2 w-px bg-border" />
-                <span className="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-text-muted/70">
+                <span className="h-1.5 sm:h-2 w-px bg-border" />
+                <span className="flex items-center gap-0.5 sm:gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-text-muted/70">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 01-13.5 18v-2.25z" />
                   </svg>
                   {stats.tokens}
@@ -109,11 +109,11 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
                   title="Copy text"
                 >
                   {copied ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3.5 h-3.5 text-brand-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-brand-secondary">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75a8.965 8.965 0 00-3.75 3.125m9.75 1.375c.063.303.1.619.1.945M12 12.75a8.965 8.965 0 013.75 3.125" />
                     </svg>
                   )}
@@ -127,7 +127,7 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
                   }`}
                   title="Thumbs up"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'up' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'up' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.421.068.848.068 1.285 0 2.287-.515 4.453-1.442 6.386a2.25 2.25 0 01-2.016 1.294H9.07a2.28 2.28 0 01-1.517-.577l-4.9-4.496a.75.75 0 010-1.113l3.128-3.096a.75.75 0 011.023-.011z" />
                   </svg>
                 </button>
@@ -140,7 +140,7 @@ export function MessageBubble({ message }: MessageBubbleProps): React.JSX.Elemen
                   }`}
                   title="Thumbs down"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'down' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill={feedback === 'down' ? 'currentColor' : 'none'} viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3 h-3 sm:w-3.5 sm:h-3.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.367 13.5c-.806 0-1.533.446-2.031 1.08a9.041 9.041 0 01-2.861 2.4c-.723.384-1.35.956-1.653 1.715a4.498 4.498 0 00-.322 1.672V21a.75.75 0 01-.75.75 2.25 2.25 0 01-2.25-2.25c0-1.152.26-2.243.723-3.218.266-.558-.107-1.282-.725-1.282H6.368c-1.026 0-1.945-.694-2.054-1.715a12.04 12.04 0 01-.068-1.285c0-2.287.515-4.453 1.442-6.386A2.25 2.25 0 017.704 6.75h9.002c.677 0 1.285.393 1.517.577l4.9 4.496a.75.75 0 010 1.113l-3.128 3.096a.75.75 0 01-1.023.011z" />
                   </svg>
                 </button>
