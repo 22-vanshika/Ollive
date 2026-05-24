@@ -1,10 +1,6 @@
 {
   "builds": [
     {
-      "src": "backend/api.py",
-      "use": "@vercel/python"
-    },
-    {
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -14,16 +10,12 @@
   ],
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/backend/api.py"
+      "source": "/api/:path*",
+      "destination": "https://ollive-production.up.railway.app/api/:path*"
     },
     {
       "source": "/health",
-      "destination": "/backend/api.py"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "/frontend/assets/$1"
+      "destination": "https://ollive-production.up.railway.app/health"
     },
     {
       "source": "/(.*)",
