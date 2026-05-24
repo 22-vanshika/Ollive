@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# Always run from the directory containing this script so alembic finds its ini file
+cd "$(dirname "$0")"
+
 echo "[Ollive] Running database migrations..."
 alembic upgrade head
 echo "[Ollive] Migrations complete. Starting server on port ${PORT:-8000}..."
