@@ -42,6 +42,11 @@ export function ChatPage(): React.JSX.Element {
   const [searchQuery, setSearchQuery] = useState('')
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [showOverflowMenu, setShowOverflowMenu] = useState(false)
+  // Which welcome suggestion is mid-launch, so we can spin it and avoid stale-click confusion.
+  const [pendingSuggestionId, setPendingSuggestionId] = useState<string | null>(null)
+
+  // A new conversation is being spun up (either via the + button or a suggestion).
+  const isStartingConversation = isCreatingConversation || isSending
 
   // Local storage state for pinned conversation IDs
   const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
@@ -103,7 +108,9 @@ export function ChatPage(): React.JSX.Element {
     (c) => !pinnedIds.includes(c.id)
   )
 
-  const handleSuggestionClick = (text: string): void => {
+  const handleSuggestionClick = (id: string, text: string): void => {
+    if (isStartingConversation) return
+    setPendingSuggestionId(id)
     sendMessage(text)
   }
 
@@ -491,8 +498,14 @@ export function ChatPage(): React.JSX.Element {
                   return (
                     <button
                       key={s.id}
-                      onClick={() => handleSuggestionClick(s.description)}
-                      className="group p-3 sm:p-5 text-left rounded-xl bg-surface-raised border border-border/80 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-base cursor-pointer focus:border-brand-primary flex flex-col justify-between"
+                      onClick={() => handleSuggestionClick(s.id, s.description)}
+                      disabled={isStartingConversation}
+                      className={[
+                        'group p-3 sm:p-5 text-left rounded-xl bg-surface-raised border border-border/80 shadow-sm transition-all duration-base focus:border-brand-primary flex flex-col justify-between',
+                        isStartingConversation
+                          ? 'opacity-60 cursor-wait'
+                          : 'hover:shadow-md hover:-translate-y-0.5 cursor-pointer',
+                      ].join(' ')}
                     >
                       <div>
                         <div className="flex items-center gap-2.5">
@@ -524,6 +537,9 @@ export function ChatPage(): React.JSX.Element {
                           <span className="text-xs sm:text-sm font-semibold text-text-primary truncate">
                             {s.title}
                           </span>
+                          {pendingSuggestionId === s.id && isStartingConversation && (
+                            <span className="ml-auto block w-3.5 h-3.5 rounded-full border-2 border-brand-primary/25 border-t-brand-primary animate-spin shrink-0" />
+                          )}
                         </div>
                         <p className="text-[10px] sm:text-xs text-text-secondary/90 mt-2 font-normal leading-relaxed line-clamp-2 sm:line-clamp-none">
                           {s.description}

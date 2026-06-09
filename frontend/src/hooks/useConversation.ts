@@ -49,6 +49,11 @@ export function useConversation(): UseConversationResult {
   }, [setConversations, setLoadingConversations])
 
   const createNewConversation = useCallback(async () => {
+    // Guard at the function level (not just via a disabled button): a slow
+    // backend tempts users to click repeatedly, and the disabled prop only
+    // applies after a re-render — so a fast double-click would otherwise spawn
+    // duplicate conversations. Concurrent calls become no-ops.
+    if (useConversationStore.getState().isCreatingConversation) return
     setCreatingConversation(true)
     try {
       const conversation = await createConversation()
@@ -108,6 +113,10 @@ export function useConversation(): UseConversationResult {
 
   const sendMessage = useCallback(
     async (content: string) => {
+      // Drop overlapping sends — repeated clicks while a reply is in flight (or
+      // while the first conversation is still being created) must not stack up.
+      if (useConversationStore.getState().isSending) return
+
       // Read live ID from the store — not the stale closure — so a just-created
       // conversation is visible immediately without waiting for a re-render.
       let conversationId = useConversationStore.getState().activeConversationId
