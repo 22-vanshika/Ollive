@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { useConversationStore } from '@/store'
 import {
   fetchConversations,
@@ -20,6 +20,7 @@ export function useConversation(): UseConversationResult {
     messages,
     isLoadingConversations,
     isLoadingMessages,
+    isCreatingConversation,
     isSending,
     setConversations,
     setActiveConversation,
@@ -29,18 +30,26 @@ export function useConversation(): UseConversationResult {
     updateConversation,
     setLoadingConversations,
     setLoadingMessages,
+    setCreatingConversation,
     setSending,
   } = useConversationStore()
 
-  useEffect(() => {
+  // Loading is driven by the caller (once the backend is confirmed awake) rather
+  // than on mount, so the list doesn't time out to empty during a cold start.
+  const reloadConversations = useCallback(async () => {
     setLoadingConversations(true)
-    fetchConversations()
-      .then(setConversations)
-      .catch(console.error)
-      .finally(() => setLoadingConversations(false))
+    try {
+      const loaded = await fetchConversations()
+      setConversations(loaded)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingConversations(false)
+    }
   }, [setConversations, setLoadingConversations])
 
   const createNewConversation = useCallback(async () => {
+    setCreatingConversation(true)
     try {
       const conversation = await createConversation()
       const current = useConversationStore.getState().conversations
@@ -49,8 +58,10 @@ export function useConversation(): UseConversationResult {
       setMessages([])
     } catch (err) {
       console.error(err)
+    } finally {
+      setCreatingConversation(false)
     }
-  }, [setActiveConversation, setConversations, setMessages])
+  }, [setActiveConversation, setConversations, setMessages, setCreatingConversation])
 
   const selectConversation = useCallback(async (id: string) => {
     setActiveConversation(id)
@@ -229,8 +240,10 @@ export function useConversation(): UseConversationResult {
     messages,
     isLoadingConversations,
     isLoadingMessages,
+    isCreatingConversation,
     isSending,
     createNewConversation,
+    reloadConversations,
     selectConversation,
     deleteConversation: handleDeleteConversation,
     sendMessage,

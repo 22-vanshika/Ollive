@@ -10,6 +10,12 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
+      // Mirror Vercel's prod routing so the health check hits the real backend
+      // in dev (otherwise it falls through to the SPA and always looks healthy).
+      '/health': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
   resolve: {

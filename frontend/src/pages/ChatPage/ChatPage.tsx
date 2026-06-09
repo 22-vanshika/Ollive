@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
-import { ConversationList, MessageBubble, ChatInput } from '@/components/chat'
-import { useConversation } from '@/hooks'
+import { ConversationList, MessageBubble, ChatInput, BackendStatusModal } from '@/components/chat'
+import { useConversation, useBackendStatus } from '@/hooks'
 import { useConversationStore } from '@/store'
 import { WELCOME_SUGGESTIONS, UNTITLED_CONVERSATION, APP_VERSION } from '@/constants'
 
@@ -11,12 +11,24 @@ export function ChatPage(): React.JSX.Element {
     messages,
     isLoadingConversations,
     isLoadingMessages,
+    isCreatingConversation,
     isSending,
     createNewConversation,
+    reloadConversations,
     selectConversation,
     deleteConversation,
     sendMessage,
   } = useConversation()
+
+  const { status: backendStatus, retry: retryBackend } = useBackendStatus()
+
+  // Load conversations only once the backend is confirmed awake, so a cold start
+  // doesn't leave the list empty after a timed-out fetch.
+  useEffect(() => {
+    if (backendStatus === 'online') {
+      void reloadConversations()
+    }
+  }, [backendStatus, reloadConversations])
 
   const {
     isSidebarOpen,
@@ -118,6 +130,9 @@ export function ChatPage(): React.JSX.Element {
 
   return (
     <div className="flex h-full w-full bg-surface-base select-none overflow-hidden font-sans">
+      {/* Backend wake-up / offline modal (cold-start awareness) */}
+      <BackendStatusModal status={backendStatus} onRetry={retryBackend} />
+
       {/* Mobile Drawer Overlay */}
       {isSidebarOpen && (
         <div
@@ -147,19 +162,24 @@ export function ChatPage(): React.JSX.Element {
               {/* Elegant New Chat Button inside sidebar */}
               <button
                 onClick={createNewConversation}
-                className="p-1.5 rounded-full bg-brand-primary text-text-inverse hover:opacity-95 active:scale-95 transition-all shadow-sm cursor-pointer"
-                title="Start a new exploration"
+                disabled={isCreatingConversation}
+                className="p-1.5 rounded-full bg-brand-primary text-text-inverse hover:opacity-95 active:scale-95 transition-all shadow-sm cursor-pointer disabled:opacity-60 disabled:cursor-wait"
+                title={isCreatingConversation ? 'Creating exploration…' : 'Start a new exploration'}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2.5"
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
+                {isCreatingConversation ? (
+                  <span className="block w-4 h-4 rounded-full border-2 border-text-inverse/30 border-t-text-inverse animate-spin" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="2.5"
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                )}
               </button>
 
               {/* Mobile Drawer Close Button */}

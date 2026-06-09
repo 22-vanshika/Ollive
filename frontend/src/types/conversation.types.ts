@@ -51,6 +51,7 @@ export interface ConversationState {
   messages: Message[]
   isLoadingConversations: boolean
   isLoadingMessages: boolean
+  isCreatingConversation: boolean
   isSending: boolean
   isSidebarOpen: boolean
   isSidebarCollapsed: boolean
@@ -63,6 +64,7 @@ export interface ConversationState {
   updateConversation: (id: string, patch: Partial<Conversation>) => void
   setLoadingConversations: (loading: boolean) => void
   setLoadingMessages: (loading: boolean) => void
+  setCreatingConversation: (creating: boolean) => void
   setSending: (sending: boolean) => void
   setSidebarOpen: (isOpen: boolean) => void
   setSidebarCollapsed: (isCollapsed: boolean) => void
@@ -74,8 +76,10 @@ export interface UseConversationResult {
   messages: Message[]
   isLoadingConversations: boolean
   isLoadingMessages: boolean
+  isCreatingConversation: boolean
   isSending: boolean
   createNewConversation: () => Promise<void>
+  reloadConversations: () => Promise<void>
   selectConversation: (id: string) => Promise<void>
   deleteConversation: (id: string) => Promise<void>
   sendMessage: (content: string) => Promise<void>
